@@ -1,0 +1,24 @@
+body{
+    margin: auto auto;
+    background-color: black;
+}
+
+#exportGameData{
+    margin: 0;
+    padding: 0;
+    color: white;
+    position: absolute;
+    right: 5px;
+    bottom: 0px;
+    font-size: 5em;
+}
+
+.importGameData{
+    margin: 0;
+    padding: 0;
+    color: white;
+    position: absolute;
+    right: 70px;
+    bottom: 0px;
+    font-size: 5em;
+}
