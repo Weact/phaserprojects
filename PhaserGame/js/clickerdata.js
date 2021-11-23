@@ -1,9 +1,12 @@
 var game_progression = {
     xion: 0,
     gear: 0,
+    test: 1,
+    test2: 3,
+    abe: "alo",
     golden_gear: 0,
-
-    multiplier: 1.0
+    multiplier: 1.0,
+    autoclick_frequency: 5.0
 }
 
 function save_game(el){

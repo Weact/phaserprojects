@@ -2,8 +2,9 @@ var assets_clicker_path = 'assets/clicker/'
 
 var game_objects_path = {
 
-    //BACKGROUND
+    //UI
     game_background: assets_clicker_path + 'GameBackground.png',
+    box_border: assets_clicker_path + 'UI/BoxBorder.png',
 
     //GEARS
     gear: { path: assets_clicker_path + 'gear/GearSpriteSheet.png', dim: {frameWidth: 44, frameHeight: 44} },
