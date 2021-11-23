@@ -1,12 +1,19 @@
 var game_progression = {
     xion: 0,
+
     gear: 0,
-    test: 1,
-    test2: 3,
-    abe: "alo",
     golden_gear: 0,
+
     multiplier: 1.0,
-    autoclick_frequency: 5.0
+
+
+    upgrade_one_bought: false,
+    upgrade_two_bought: false,
+    upgrade_three_bought: false,
+    upgrade_four_bought: false,
+
+    autoclick_enabled: false,
+    autoclick_frequency: 5000
 }
 
 function save_game(el){

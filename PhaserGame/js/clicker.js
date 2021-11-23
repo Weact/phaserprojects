@@ -60,7 +60,7 @@ function create(){
     box_border_img.setDisplaySize(xion_x_max - xion_x_min, xion_y_max - xion_y_min);
     box_border_img.setDepth(1);
 
-    xion_collected_text = this.add.text(80, 40, game_progression.xion + xion_collected_text_base, { fontSize: '64px', fill: '#FFF'});
+    xion_collected_text = this.add.text(20, 40, game_progression.xion + xion_collected_text_base, { fontSize: '64px', fill: '#FFF'});
 
     xion_multiplier_changed_text = this.add.text(110, 100, "MULTIPLIER HAS BEEN INCREASED TO " + game_progression.multiplier, {fontSize: "24px", fill:"#FFF"});
     display_text(xion_multiplier_changed_text, false);
@@ -73,65 +73,68 @@ function create(){
 }
 
 function update(){
-    console.log(game_progression);
 }
 
 function update_xion_collected_text(){
     xion_collected_text.setText(game_progression.xion + xion_collected_text_base);
 }
 
-function _on_xion_clicked(){
+function _on_xion_clicked(_pointer = undefined, _pointer_x = undefined, _pointer_y = undefined, _propagation = undefined, by_autoclicker = false){
+
+
     game_progression.xion += Math.round(xion_object.value * game_progression.multiplier, 0);
     update_xion_collected_text();
     _on_xion_changed(game_progression.xion);
-    replace_xion();
+
+    if(by_autoclicker == false){
+        replace_xion();
+    }
 }
 
 function _on_xion_changed(value){
     let has_multiplier_changed = false;
 
-    console.log(value);
-    console.log(game_progression.upgrade_one_bought);
-    console.log(game_progression);
+    if(value >= 10 && game_progression.autoclick_enabled == false){
 
-    if (value >= 100 && game_progression.upgrade_one_bought == false){
+        game_progression.autoclick_enabled = true;
+        autoclick();
 
-        game_progression.upgrade_one_bought = true;
-        game_progression.multiplier = 2.0;
-
-        xion_multiplier_changed_text.text = "XION MULTIPLIER HAS BEEN INCREASED TO 2";
-        display_text(xion_multiplier_changed_text, true);
+        xion_multiplier_changed_text.text = "AUTOCLICKER HAS BEEN ACTIVATED";
+        display_text(xion_multiplier_changed_text, true, true);
 
     }else{
-        if(value >= 500 && game_progression.upgrade_two_bought == false){
+        if (value >= 100 && game_progression.upgrade_one_bought == false){
 
-            game_progression.upgrade_two_bought = true;
-            game_progression.multiplier = 3.0;
-
-            xion_multiplier_changed_text.text = "XION MULTIPLIER HAS BEEN INCREASED TO 3";
-            display_text(xion_multiplier_changed_text, true);
-
+            game_progression.upgrade_one_bought = true;
+            game_progression.multiplier = 2.0;
+    
+            xion_multiplier_changed_text.text = "XION MULTIPLIER HAS BEEN INCREASED TO 2";
+            display_text(xion_multiplier_changed_text, true, true);
+    
         }else{
-            if(value >= 750 && game_progression.autoclick_enabled == false){
-
-                game_progression.autoclick_enabled = true;
-                autoclick();
-
+            if(value >= 500 && game_progression.upgrade_two_bought == false){
+    
+                game_progression.upgrade_two_bought = true;
+                game_progression.multiplier = 3.0;
+    
+                xion_multiplier_changed_text.text = "XION MULTIPLIER HAS BEEN INCREASED TO 3";
+                display_text(xion_multiplier_changed_text, true, true);
+    
             }else{
                 if(value >= 7000 && game_progression.upgrade_three_bought == false){
-
+    
                     game_progression.upgrade_three_bought = true;
                     game_progression.multiplier = 4.0;
-
+    
                     xion_multiplier_changed_text.text = "XION MULTIPLIER HAS BEEN INCREASED TO 4";
-                    display_text(xion_multiplier_changed_text, true);
-
+                    display_text(xion_multiplier_changed_text, true, true);
+    
                 }else{
                     if(value === 1000000 && game_progression.upgrade_four_bought == false){
-
+    
                         game_progression.upgrade_four_bought = true;
                         game_progression.multiplier = 5.0;
-
+    
                         xion_multiplier_changed_text.text = "XION MULTIPLIER HAS BEEN INCREASED TO 5";
                         display_text(xion_multiplier_changed_text, true, true);
                     }
@@ -159,8 +162,8 @@ function replace_xion(){
 
 function autoclick(){
     if (game_progression.autoclick_enabled == true){
-        _on_xion_clicked();
+        _on_xion_clicked(undefined, undefined, undefined, undefined, true);
     }
 
-    myScene.time.delayedCall(game_progression.autoclick_frequency, autoclick);
+    myScene.time.delayedCall(game_progression.autoclick_frequency, autoclick, [undefined, undefined, undefined, undefined, true]);
 }
