@@ -1,5 +1,5 @@
 class item{
-    constructor(initial_price = 0, xion_amount, price_coeff = 1.0, frequency = 1000.0){
+    constructor(initial_price = 0, xion_amount = 0, price_coeff = 1.12, frequency = 1000.0){
         this.initial_price = initial_price;
         this.xion_amount = xion_amount; //xion quantity this item will give each generation
         this.price_coeff = price_coeff; //how many xion this item will increase in price everytime it was bought
@@ -48,14 +48,20 @@ class item{
     }
 }
 
+class xion extends item{
+    constructor(initial_price = 0, xion_amount = 1, price_coeff = 0, frequency = 0){
+        super(initial_price, xion_amount, price_coeff, frequency);
+    }
+}
+
 class autoclicker extends item{
-    constructor(initial_price = 10, xion_amount = 1, price_coeff = 1.05, frequency = 5000.0){
+    constructor(initial_price = 10, xion_amount = 1, price_coeff = 1.08, frequency = 5000.0){
         super(initial_price, xion_amount, price_coeff, frequency);
     }
 }
 
 class xiongenerator extends item{
-    constructor(initial_price = 1000, xion_amount = 10, price_coeff = 1.12, frequency = 2500.0){
+    constructor(initial_price = 1000, xion_amount = 10, price_coeff = 1.12, frequency = 4000.0){
         super(initial_price, xion_amount, price_coeff, frequency);
     }
 }

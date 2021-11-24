@@ -28,7 +28,7 @@ var gameTickText = "";
 var timestamp = Math.round( + new Date() / 1000);
 
 // XION
-var xion_object = new xion(1); //obj
+var xion_object = new xion(); //obj
 
 var xion_image; //image
 
@@ -116,7 +116,7 @@ function update_xion_collected_text(){
 function _on_xion_clicked(_pointer = undefined, _pointer_x = undefined, _pointer_y = undefined, _propagation = undefined, by_autoclicker = false){
 
 
-    game_progression.xion += Math.round(xion_object.value * game_progression.multiplier, 0);
+    game_progression.xion += Math.round(xion_object.xion_amount * game_progression.multiplier, 0);
     update_xion_collected_text();
     _on_xion_changed(game_progression.xion);
 
