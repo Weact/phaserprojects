@@ -17,19 +17,26 @@ var config = {
     }
 };
 
+
+// GAME
 var game = new Phaser.Game(config);
 
 var myScene;
 var myPointer;
 
-var gameTick = 0;
-var gameTickText = "";
+var gameTime = 0.0;
+var gameTimeCurrent = 0.0;
+var deltaTime = 0.0;
 
-var timestamp = Math.round( + new Date() / 1000);
+// GAME PROGRESSION
+var myGameProgression = new GameProgression();
+
+// ITEMS
+var xion_object = new xion();
+var xion_autoclicker = new autoclicker();
+var xion_generator = new xiongenerator();
 
 // XION
-var xion_object = new xion(); //obj
-
 var xion_image; //image
 
 // XION TEXT
@@ -47,17 +54,13 @@ var xion_y_max = 1080 - xion_y_min*1.5;
 // XION PER SECOND
 
 var xps = 0;
-var xps_highest = 0;
 
 // XION PER SECOND TEXT
 
 var xps_text;
 var xps_text_base = " XION PER SECOND";
 
-// HIGHEST XION PER SECOND TEXT
-
-var xps_highest_text;
-var xps_highest_text_base = " HIGHEST XION PER SECOND";
+// METHODS
 
 function preload(){
     myScene = this;
@@ -73,7 +76,10 @@ function preload(){
 }
 
 function create(){
-    compute_xps();
+    gameTime = Date.now();
+
+    //game_progression.items = [xion_object, xion_autoclicker, xion_generator]; //v1
+    myGameProgression.set_items([xion_object, xion_autoclicker, xion_generator]); //v2
 
     let bg_image = this.add.image(0, 0, 'game_background').setOrigin(0, 0);
     let bg_scaleX = this.cameras.main.width / bg_image.width
@@ -89,93 +95,59 @@ function create(){
     box_border_img.setDisplaySize(xion_x_max - xion_x_min, xion_y_max - xion_y_min);
     box_border_img.setDepth(1);
 
-    xion_collected_text = this.add.text(40, 0, game_progression.xion + xion_collected_text_base, { fontSize: '64px', fill: '#FFF'});
-    xion_multiplier_changed_text = this.add.text(50, 120, "MULTIPLIER HAS BEEN INCREASED TO " + game_progression.multiplier, {fontSize: "24px", fill:"#FFF"});
-    display_text(xion_multiplier_changed_text, false);
-    update_xion_collected_text();
+    //xion_collected_text = this.add.text(40, 0, game_progression.xion + xion_collected_text_base, { fontSize: '64px', fill: '#FFF'}); //v1
+    xion_collected_text = this.add.text(40, 0, myGameProgression.get_xion() + xion_collected_text_base, { fontSize: '64px', fill: '#FFF'}); //v2
+
+    //xion_multiplier_changed_text = this.add.text(50, 120, "MULTIPLIER HAS BEEN INCREASED TO " + game_progression.multiplier, {fontSize: "24px", fill:"#FFF"}); v1
+    //display_text(xion_multiplier_changed_text, false);v1
 
     xps_text = this.add.text(50, 60, xps + xps_text_base, {fontSize: "24px", fill:"#FFF"} ) ;
-    xps_highest_text = this.add.text(50, 80, xps_highest + xps_highest_text_base, {fontSize: "24px", fill:"#FFF"} ) ;
 
-    gameTickText = this.add.text(0, 0, gameTick, {fontSize: "10px"});
+    display_xion();
+    display_xps();
 
-    if(game_progression.autoclick_enabled == true){
-        autoclick();
-    }
+    // v1
+    // if(game_progression.items[1].player_owned > 0){
+    //     autoclick();
+    // }
+
+    // v2 : irrelevant ?
+    // if(myGameProgression.items[1].player_owned > 0){
+    //     autoclick();
+    // }
 }
 
 function update(){
-    gameTick++;
-    gameTickText.text = gameTick;
-}
+    // const element = Object.values(game_progression)[Object.keys(game_progression).length - 1][0].player_owned;
+    // console.log(element);
 
-function update_xion_collected_text(){
-    xion_collected_text.setText(game_progression.xion + xion_collected_text_base);
+    gameTimeCurrent = Date.now();
+    if(gameTimeCurrent - gameTime > 0){
+        deltaTime = (gameTimeCurrent - gameTime) / 1000
+        //game_progression.xion += get_total_earnings() * deltaTime; //320 = total building quantity value //v1
+        myGameProgression.add_xion(get_total_earnings() * deltaTime); //v2
+    }
+    gameTime = gameTimeCurrent;
 }
 
 function _on_xion_clicked(_pointer = undefined, _pointer_x = undefined, _pointer_y = undefined, _propagation = undefined, by_autoclicker = false){
-
-
-    game_progression.xion += Math.round(xion_object.xion_amount * game_progression.multiplier, 0);
-    update_xion_collected_text();
-    _on_xion_changed(game_progression.xion);
-
+    give_xion(xion_object);
+    
     if(by_autoclicker == false){
         replace_xion();
     }
 }
 
-function _on_xion_changed(value){
-    let has_multiplier_changed = false;
+function give_xion( item ){
+    //game_progression.xion += item.xion_amount * item.multiplier * item.player_owned; //v1
+    myGameProgression.add_xion(item.xion_amount * item.multiplier * item.player_owned); //v2
+}
 
-    if(value >= 10 && game_progression.autoclick_enabled == false){
+function _on_xion_changed(){
+    //let value = game_progression.xion; //v1
 
-        game_progression.autoclick_enabled = true;
-        autoclick();
-
-        xion_multiplier_changed_text.text = "AUTOCLICKER HAS BEEN ACTIVATED";
-        display_text(xion_multiplier_changed_text, true, true);
-
-    }else{
-        if (value >= 100 && game_progression.upgrade_one_bought == false){
-
-            game_progression.upgrade_one_bought = true;
-            game_progression.multiplier = 2.0;
-    
-            xion_multiplier_changed_text.text = "XION MULTIPLIER HAS BEEN INCREASED TO 2";
-            display_text(xion_multiplier_changed_text, true, true);
-    
-        }else{
-            if(value >= 500 && game_progression.upgrade_two_bought == false){
-    
-                game_progression.upgrade_two_bought = true;
-                game_progression.multiplier = 3.0;
-    
-                xion_multiplier_changed_text.text = "XION MULTIPLIER HAS BEEN INCREASED TO 3";
-                display_text(xion_multiplier_changed_text, true, true);
-    
-            }else{
-                if(value >= 7000 && game_progression.upgrade_three_bought == false){
-    
-                    game_progression.upgrade_three_bought = true;
-                    game_progression.multiplier = 4.0;
-    
-                    xion_multiplier_changed_text.text = "XION MULTIPLIER HAS BEEN INCREASED TO 4";
-                    display_text(xion_multiplier_changed_text, true, true);
-    
-                }else{
-                    if(value === 1000000 && game_progression.upgrade_four_bought == false){
-    
-                        game_progression.upgrade_four_bought = true;
-                        game_progression.multiplier = 5.0;
-    
-                        xion_multiplier_changed_text.text = "XION MULTIPLIER HAS BEEN INCREASED TO 5";
-                        display_text(xion_multiplier_changed_text, true, true);
-                    }
-                }
-            }
-        }
-    }
+    display_xion();
+    myGameProgression.check_for_items();
 }
 
 function display_text(text, value, auto_hide = false, destroy = false){
@@ -194,31 +166,37 @@ function replace_xion(){
     xion_image.setPosition(Phaser.Math.FloatBetween(xion_x_min, xion_x_max), Phaser.Math.FloatBetween(xion_y_min, xion_y_max) );
 }
 
-function autoclick(){
-    if (game_progression.autoclick_enabled == true){
-        _on_xion_clicked(undefined, undefined, undefined, undefined, true);
-    }
+//function autoclick(){
+    // (game_progression.autoclick_enabled == true){
+    //    _on_xion_clicked(undefined, undefined, undefined, undefined, true);
+    //}
 
-    myScene.time.delayedCall(game_progression.autoclick_frequency, autoclick, [undefined, undefined, undefined, undefined, true]);
+   // myScene.time.delayedCall(game_progression.autoclick_frequency, autoclick, [undefined, undefined, undefined, undefined, true]);
+//}
+
+function display_xion(){
+    xion_collected_text.text = Math.round(myGameProgression.get_xion(), 0) + xion_collected_text_base;
 }
 
-function compute_xps(){
-    var current_xion = game_progression.xion;
-
-    myScene.time.delayedCall(1000, get_xps, [current_xion]);
-}
-
-function get_xps(old_xion_amount = 0){
-    var new_current_xion = game_progression.xion
-
-    xps = new_current_xion - old_xion_amount;
-    
-    if(xps > xps_highest){
-        xps_highest = xps;
-    }
-        
+function display_xps(){
     xps_text.text = xps + xps_text_base;
-    xps_highest_text.text = xps_highest + xps_highest_text_base;
+    console.log("XION PER SECONDS FROM BUILDING : " + xps);
+    myScene.time.delayedCall(1000, display_xps);
+}
 
-    compute_xps();
+function get_total_earnings(){
+    let total_earnings = 0;
+    let target_item;
+
+    for (let item = 0; item < myGameProgression.get_items().length; item++) {
+        target_item = myGameProgression.get_items()[item];
+
+        if(target_item.name != "xion"){
+            const item_earning = target_item.xion_amount * target_item.multiplier * target_item.player_owned;
+            total_earnings += item_earning;
+        }
+    }
+
+    xps = total_earnings;
+    return xps;
 }
