@@ -144,9 +144,6 @@ function give_xion( item ){
 }
 
 function _on_xion_changed(){
-    //let value = game_progression.xion; //v1
-
-    display_xion();
     myGameProgression.check_for_items();
 }
 
@@ -166,21 +163,14 @@ function replace_xion(){
     xion_image.setPosition(Phaser.Math.FloatBetween(xion_x_min, xion_x_max), Phaser.Math.FloatBetween(xion_y_min, xion_y_max) );
 }
 
-//function autoclick(){
-    // (game_progression.autoclick_enabled == true){
-    //    _on_xion_clicked(undefined, undefined, undefined, undefined, true);
-    //}
-
-   // myScene.time.delayedCall(game_progression.autoclick_frequency, autoclick, [undefined, undefined, undefined, undefined, true]);
-//}
-
 function display_xion(){
     xion_collected_text.text = Math.round(myGameProgression.get_xion(), 0) + xion_collected_text_base;
+    myScene.time.delayedCall(24, display_xion);
 }
 
 function display_xps(){
+
     xps_text.text = xps + xps_text_base;
-    console.log("XION PER SECONDS FROM BUILDING : " + xps);
     myScene.time.delayedCall(1000, display_xps);
 }
 
