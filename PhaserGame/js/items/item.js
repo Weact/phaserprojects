@@ -8,7 +8,7 @@ class item{
         this.multiplier = multiplier; //bonus to the item : raw_xion = xion_amount * multiplier
         this.player_owned = player_owned;
 
-        this.xion_per_second = this.update_xion_per_second(); // item's xps = ( (xion_amount * quantity) * (delta/1000) ) 
+        this.xion_per_second = this.update_xion_per_second(); // item's xps = ( (xion_amount * quantity) * (delta/1000) )
     }
 
     set_name(new_name){

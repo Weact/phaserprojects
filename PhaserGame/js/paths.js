@@ -11,5 +11,8 @@ var game_objects_path = {
     golden_gear: { path: assets_clicker_path + 'gear/GoldenGearSpriteSheet.png', dim: {frameWidth: 44, frameHeight: 44} },
 
     //XION
-    xion: assets_clicker_path + 'Xion/Xion.png'
+    xion: assets_clicker_path + 'Xion/Xion.png',
+
+    //ELEMENTS
+    xl_platform: assets_clicker_path + "Elements/PlatformXion.png"
 }

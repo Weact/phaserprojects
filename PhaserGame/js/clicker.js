@@ -60,6 +60,11 @@ var xps = 0;
 var xps_text;
 var xps_text_base = " XION PER SECOND";
 
+// Platformer
+
+//Platform
+var platform;
+
 // METHODS
 
 function preload(){
@@ -73,13 +78,14 @@ function preload(){
     this.load.spritesheet('gear', game_objects_path.gear.path, game_objects_path.gear.dim );
     this.load.spritesheet('golden_gear', game_objects_path.golden_gear.path, game_objects_path.golden_gear.dim );
     this.load.image('xion', game_objects_path.xion);
+
+    this.load.image('platform', game_objects_path.xl_platform);
 }
 
 function create(){
     gameTime = Date.now();
 
-    //game_progression.items = [xion_object, xion_autoclicker, xion_generator]; //v1
-    myGameProgression.set_items([xion_object, xion_autoclicker, xion_generator]); //v2
+    myGameProgression.set_items([xion_object, xion_autoclicker, xion_generator]);
 
     let bg_image = this.add.image(0, 0, 'game_background').setOrigin(0, 0);
     let bg_scaleX = this.cameras.main.width / bg_image.width
@@ -95,36 +101,30 @@ function create(){
     box_border_img.setDisplaySize(xion_x_max - xion_x_min, xion_y_max - xion_y_min);
     box_border_img.setDepth(1);
 
-    //xion_collected_text = this.add.text(40, 0, game_progression.xion + xion_collected_text_base, { fontSize: '64px', fill: '#FFF'}); //v1
-    xion_collected_text = this.add.text(40, 0, myGameProgression.get_xion() + xion_collected_text_base, { fontSize: '64px', fill: '#FFF'}); //v2
+    platform = this.add.image(1126, 700, 'platform').setOrigin(0,0).setScale(1,1);
+    platform = this.add.image(1198, 700, 'platform').setOrigin(0,0).setScale(1,1);
+    platform = this.add.image(1270, 700, 'platform').setOrigin(0,0).setScale(1,1);
+    platform = this.add.image(1342, 700, 'platform').setOrigin(0,0).setScale(1,1);
+    platform = this.add.image(1414, 700, 'platform').setOrigin(0,0).setScale(1,1);
+    platform = this.add.image(1486, 700, 'platform').setOrigin(0,0).setScale(1,1);
+    platform = this.add.image(1558, 700, 'platform').setOrigin(0,0).setScale(1,1);
+    platform = this.add.image(1630, 700, 'platform').setOrigin(0,0).setScale(1,1);
+    platform = this.add.image(1702, 700, 'platform').setOrigin(0,0).setScale(1,1);
+    platform = this.add.image(1774, 700, 'platform').setOrigin(0,0).setScale(1,1);
+    platform = this.add.image(1846, 700, 'platform').setOrigin(0,0).setScale(1,1);
 
-    //xion_multiplier_changed_text = this.add.text(50, 120, "MULTIPLIER HAS BEEN INCREASED TO " + game_progression.multiplier, {fontSize: "24px", fill:"#FFF"}); v1
-    //display_text(xion_multiplier_changed_text, false);v1
+    xion_collected_text = this.add.text(40, 0, myGameProgression.get_xion() + xion_collected_text_base, { fontSize: '64px', fill: '#FFF'});
 
     xps_text = this.add.text(50, 60, xps + xps_text_base, {fontSize: "24px", fill:"#FFF"} ) ;
 
     display_xion();
     display_xps();
-
-    // v1
-    // if(game_progression.items[1].player_owned > 0){
-    //     autoclick();
-    // }
-
-    // v2 : irrelevant ?
-    // if(myGameProgression.items[1].player_owned > 0){
-    //     autoclick();
-    // }
 }
 
 function update(){
-    // const element = Object.values(game_progression)[Object.keys(game_progression).length - 1][0].player_owned;
-    // console.log(element);
-
     gameTimeCurrent = Date.now();
     if(gameTimeCurrent - gameTime > 0){
         deltaTime = (gameTimeCurrent - gameTime) / 1000
-        //game_progression.xion += get_total_earnings() * deltaTime; //320 = total building quantity value //v1
         myGameProgression.add_xion(get_total_earnings() * deltaTime); //v2
     }
     gameTime = gameTimeCurrent;
@@ -132,15 +132,14 @@ function update(){
 
 function _on_xion_clicked(_pointer = undefined, _pointer_x = undefined, _pointer_y = undefined, _propagation = undefined, by_autoclicker = false){
     give_xion(xion_object);
-    
+
     if(by_autoclicker == false){
         replace_xion();
     }
 }
 
 function give_xion( item ){
-    //game_progression.xion += item.xion_amount * item.multiplier * item.player_owned; //v1
-    myGameProgression.add_xion(item.xion_amount * item.multiplier * item.player_owned); //v2
+    myGameProgression.add_xion(item.xion_amount * item.multiplier * item.player_owned);
 }
 
 function _on_xion_changed(){
