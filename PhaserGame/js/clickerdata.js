@@ -13,25 +13,43 @@ class GameProgression{
 
     //XION
     set_xion(new_value = 0){
-        this.xion = new_value;
-        _on_xion_changed();
+        if(new_value != this.xion){
+            this.xion = new_value;
+            _on_xion_changed();
+        }
+    }
+    set_xion_lost_rate(new_value){
+        if(this.xion_lost_rate != new_value){
+            this.xion_lost_rate = new_value;
+        }
     }
     get_xion(){
         return this.xion;
     }
     add_xion(value){
-        this.xion = this.xion + value;
-        _on_xion_changed();
+        if(this.xion + value != this.xion){
+            this.xion = this.xion + value;
+            _on_xion_changed();
+        }
     }
     remove_xion(value){
-        this.xion = this.xion - value;
-        _on_xion_changed();
+        if(this.xion - value != this.xion){
+            this.xion = this.xion - value;
+            _on_xion_changed();
+        }
     }
     
     //GEAR
     set_gear(new_value){
-        this.gear = new_value;
-        _on_gear_changed();
+        if(new_value != this.gear){
+            this.gear = new_value;
+            _on_gear_changed();
+        }
+    }
+    set_gear_lost_rate(new_value){
+        if(this.gear_lost_rate != new_value){
+            this.gear_lost_rate = new_value;
+        }
     }
     get_gear(){
         return this.gear;
@@ -47,8 +65,15 @@ class GameProgression{
 
     //GOLDEN GEAR
     set_golden_gear(new_value){
-        this.golden_gear = new_value;
-        _on_golden_gear_changed();
+        if(new_value != this.golden_gear){
+            this.golden_gear = new_value;
+            _on_golden_gear_changed();
+        }
+    }
+    set_golden_gear_lost_rate(new_value){
+        if(this.set_golden_gear_lost_rate != new_value){
+            this.set_golden_gear_lost_rate = new_value;
+        }
     }
     get_golden_gear(){
         return this.golden_gear;
@@ -70,7 +95,9 @@ class GameProgression{
     }
 
     set_items(new_items = []){ // SET ALL THE ITEMS OF THE GAME PROGRESSION
-        this.items = new_items;
+        if(new_items != this.items){
+            this.items = new_items;
+        }
     }
 
     get_items(){ // GET ALL ITEMS FROM PROGRESSION
@@ -100,39 +127,33 @@ class GameProgression{
     }
 
     check_for_items(){
+        let buyable_items = []
+
         this.items.forEach(item => {
             if(item.get_name() != "xion" && this.get_xion() >= item.get_price()){
-                console.log(item.get_name() + " has been found as buyable !");
                 if(item.get_autobuy() == true){
                     this.buy_item(item);
+                }else{
+                    buyable_items.push(item);
                 }
             }
         });
+
+        return buyable_items;
     }
 
     buy_item(item){ // BUY AN ITEM BY ITS NAME
-        let item_current_price = item.get_price();
+        if(item != undefined && this.get_xion() > item.get_price() ){
+            let item_current_price = item.get_price();
 
-        this.remove_xion(item_current_price);
-        if ( item != undefined ) { item._on_item_bought(); }
+            this.remove_xion(item_current_price);
 
-        let item_next_price = item.get_price();
-
-        console.log(item + " has been bought for " + item_current_price + ". You now have " + item.get_player_owned() + ". Next price : " + item_next_price + ". Item earning per second: " + item.get_xion_per_second());
-    }
-}
-
-class GameSettings{
-    constructor(autosave = false){
-        this.autosave = autosave;
-        this.autobuy = autobuy;
-    }
-
-    set_autosave(new_value){
-        this.autosave = new_value;
-    }
-    get_autosave(){
-        return this.autosave;
+            item._on_item_bought();
+    
+            let item_next_price = item.get_price();
+    
+            display_buildings_cost_and_own();
+        }
     }
 }
 
@@ -157,9 +178,8 @@ var game_progression = {
 }
 
 function save_game(el){
-    let game_progression_dict = {}
-    game_progression_dict_json = JSON.stringify(game_progression_dict);
-    download_json(game_progression_dict_json, el);
+    let game_progression_json = JSON.stringify(myGameProgression);
+    download_json(game_progression_json, el);
 }
 
 function load_game(el){
@@ -176,14 +196,7 @@ function load_game(el){
 
     function onReaderLoad(event){
         obj = JSON.parse(event.target.result);
-
-        console.log(obj);
-        console.log(obj[0]);
-        console.log(Object.keys(obj));
-        console.log(Object.values(obj));
-
-        game_progression = obj;
-        update_xion_collected_text();
+        set_progression_data(obj);
     }
 }
 
@@ -191,4 +204,29 @@ function download_json(json, el){
     var data = "text/json;charset=utf-8," + encodeURIComponent(json);
     el.setAttribute("href", "data:"+data);
     el.setAttribute("download", "data.json");
+}
+
+function set_progression_data(obj){
+    //console.log("Keys: " + Object.keys(obj));
+    //console.log("Values: " + Object.values(obj));
+
+    let new_items = obj.items;
+    
+    Object.keys(obj).forEach(obj_keys => {
+        let setter = `set_${obj_keys}`;
+        let value = obj[obj_keys];
+
+        switch (setter) {
+            case 'set_xion': myGameProgression.set_xion(value); break;
+            case 'set_gear': myGameProgression.set_gear(value); break;
+            case 'set_golden_gear': myGameProgression.set_golden_gear(value); break;
+            case 'set_xion_lost_rate': myGameProgression.set_xion_lost_rate(value); break;
+            case 'set_gear_lost_rate': myGameProgression.set_gear_lost_rate(value); break;
+            case 'set_golden_gear_lost_rate': myGameProgression.set_golden_gear_lost_rate(value); break;
+            case 'set_items': myGameProgression.set_items(new_items); break;
+            default: console.log("#### WARNING : INVALID SETTER ####"); break;
+        }
+    });
+
+    refresh_ui();
 }
