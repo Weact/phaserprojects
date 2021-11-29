@@ -14,6 +14,13 @@ var config = {
     fps: {
         target: 360,
         forceSetTimeOut: true
+    },
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 2000 },
+            debug: false
+        }
     }
 };
 
@@ -23,10 +30,13 @@ var game = new Phaser.Game(config);
 
 var myScene;
 var myPointer;
+var cursors;
 
 var gameTime = 0.0;
 var gameTimeCurrent = 0.0;
 var deltaTime = 0.0;
+
+var mousePositionText;
 
 // GAME PROGRESSION
 var myGameProgression = new GameProgression();
@@ -58,12 +68,40 @@ var xps = 0;
 // XION PER SECOND TEXT
 
 var xps_text;
-var xps_text_base = " XION PER SECOND";
+var xps_text_base = "/s";
 
-// Platformer
+///// Platformer
 
-//Platform
-var platform;
+// Platform
+var platforms;
+
+// Player
+var player;
+var player_speed = 400;
+var player_jump_force = 600;
+var player_dir = 0;
+var player_has_jumped = false;
+var player_max_jump = 2;
+var player_spawn_position = {player_x: 1280, player_y: 800};
+
+// BLOCKS
+var iceblocks;
+var iceblock_delay = 3000;
+var iceblock_lifetime = 2000;
+
+/// COLLECTABLES
+
+// Gears
+var geatText;
+var goldenGearText;
+
+var gears;
+var golden_gears;
+var spawn_range = {x1: 920, x2: 1640, y1: 150, y2: 250};
+var spawn_delay = 5000;
+var golden_gear_spawn_delay = 60000;
+var gear_lifetime = 6000;
+var golden_gear_lifetime = 2000;
 
 // METHODS
 
@@ -80,10 +118,19 @@ function preload(){
     this.load.image('xion', game_objects_path.xion);
 
     this.load.image('platform', game_objects_path.xl_platform);
+    this.load.image('iceblock', game_objects_path.ice_block);
+
+    this.load.spritesheet('MrStonks', game_objects_path.mrstonks.path, game_objects_path.mrstonks.dim);
 }
 
 function create(){
     gameTime = Date.now();
+    cursors = this.input.keyboard.createCursorKeys();
+
+    platforms = this.physics.add.staticGroup();
+    gears = this.physics.add.group();
+    golden_gears = this.physics.add.group();
+    iceblocks = this.physics.add.group();
 
     myGameProgression.set_items([xion_object, xion_autoclicker, xion_generator]);
 
@@ -97,37 +144,55 @@ function create(){
     let xion_event = xion_image.on('pointerdown', _on_xion_clicked);
     xion_image.setPosition(Phaser.Math.FloatBetween(xion_x_min, xion_x_max), Phaser.Math.FloatBetween(xion_y_min, xion_y_max) );
 
+    this.add.image(35, 25, 'xion').setDepth(1000).setScale(1.2, 1.2);
+    xion_collected_text = this.add.text(65, 0, myGameProgression.get_xion() , { fontSize: '50px', fill: '#FFF'});
+    xps_text = this.add.text(80, 40, xps + xps_text_base, {fontSize: "20px", fill:"#FFF"} ) ;
+
+    this.add.image(35, 75, 'gear').setDepth(1000).setScale(1.2, 1.2);
+    gearText = this.add.text(65, 60, myGameProgression.get_gear(), {fontSize: '50px', fill: '#FFF'} );
+
+    this.add.image(35, 125, 'golden_gear').setDepth(1000).setScale(1.2, 1.2);
+    goldenGearText = this.add.text(65, 110, myGameProgression.get_golden_gear(), {fontSize: '50px', fill: '#FFF'} );
+
     let box_border_img = this.add.image(xion_x_min, xion_y_min, 'box_border').setOrigin(0,0);
     box_border_img.setDisplaySize(xion_x_max - xion_x_min, xion_y_max - xion_y_min);
     box_border_img.setDepth(1);
 
-    platform = this.add.image(1126, 700, 'platform').setOrigin(0,0).setScale(1,1);
-    platform = this.add.image(1198, 700, 'platform').setOrigin(0,0).setScale(1,1);
-    platform = this.add.image(1270, 700, 'platform').setOrigin(0,0).setScale(1,1);
-    platform = this.add.image(1342, 700, 'platform').setOrigin(0,0).setScale(1,1);
-    platform = this.add.image(1414, 700, 'platform').setOrigin(0,0).setScale(1,1);
-    platform = this.add.image(1486, 700, 'platform').setOrigin(0,0).setScale(1,1);
-    platform = this.add.image(1558, 700, 'platform').setOrigin(0,0).setScale(1,1);
-    platform = this.add.image(1630, 700, 'platform').setOrigin(0,0).setScale(1,1);
-    platform = this.add.image(1702, 700, 'platform').setOrigin(0,0).setScale(1,1);
-    platform = this.add.image(1774, 700, 'platform').setOrigin(0,0).setScale(1,1);
-    platform = this.add.image(1846, 700, 'platform').setOrigin(0,0).setScale(1,1);
+    instanciate_platforms();
+    instanciate_player();
+    this.time.delayedCall(spawn_delay, instanciate_gears);
+    this.time.delayedCall(golden_gear_spawn_delay, instanciate_golden_gears);
+    this.time.delayedCall(iceblock_delay, instanciate_iceblock);
 
-    xion_collected_text = this.add.text(40, 0, myGameProgression.get_xion() + xion_collected_text_base, { fontSize: '64px', fill: '#FFF'});
+    this.physics.add.collider(player, platforms);
+    this.physics.add.collider(gears, platforms);
+    this.physics.add.collider(golden_gears, platforms);
+    this.physics.add.overlap(player, gears, _on_gears_hit, null, this);
+    this.physics.add.overlap(player, golden_gears, _on_golden_gears_hit, null, this);
+    this.physics.add.collider(platforms, iceblocks);
+    this.physics.add.overlap(player, iceblocks, _on_player_hit_iceblock, null, this);
 
-    xps_text = this.add.text(50, 60, xps + xps_text_base, {fontSize: "24px", fill:"#FFF"} ) ;
+    mousePositionText = this.add.text(10, 920, '');
+    this.input.mouse.disableContextMenu();
 
-    display_xion();
+    display_currencies();
     display_xps();
 }
 
-function update(){
+function update(time, delta){
     gameTimeCurrent = Date.now();
     if(gameTimeCurrent - gameTime > 0){
         deltaTime = (gameTimeCurrent - gameTime) / 1000
         myGameProgression.add_xion(get_total_earnings() * deltaTime); //v2
     }
     gameTime = gameTimeCurrent;
+
+    player_movements();
+    update_pointer();
+}
+
+function update_pointer(){
+    mousePositionText.setText( ['x: ' + myPointer.worldX,'y: ' + myPointer.worldY ] );
 }
 
 function _on_xion_clicked(_pointer = undefined, _pointer_x = undefined, _pointer_y = undefined, _propagation = undefined, by_autoclicker = false){
@@ -144,6 +209,10 @@ function give_xion( item ){
 
 function _on_xion_changed(){
     myGameProgression.check_for_items();
+}
+function _on_gear_changed(){
+}
+function _on_golden_gear_changed(){
 }
 
 function display_text(text, value, auto_hide = false, destroy = false){
@@ -163,8 +232,21 @@ function replace_xion(){
 }
 
 function display_xion(){
-    xion_collected_text.text = Math.round(myGameProgression.get_xion(), 0) + xion_collected_text_base;
-    myScene.time.delayedCall(24, display_xion);
+    xion_collected_text.text = Math.round(myGameProgression.get_xion(), 0);
+}
+function display_gear(){
+    gearText.text = Math.round(myGameProgression.get_gear(), 0);
+}
+function display_golden_gear(){
+    goldenGearText.text = Math.round(myGameProgression.get_golden_gear(), 0);
+}
+
+function display_currencies(){
+    display_xion();
+    display_gear();
+    display_golden_gear();
+    console.log(myGameProgression.get_xion());
+    myScene.time.delayedCall(24, display_currencies);
 }
 
 function display_xps(){
@@ -188,4 +270,209 @@ function get_total_earnings(){
 
     xps = total_earnings;
     return xps;
+}
+
+function instanciate_platforms(){
+    let w_offset = -200;
+    let h_offset = 250;
+    platforms.create(1126 + w_offset, 700 + h_offset, 'platform');
+    platforms.create(1198 + w_offset, 700 + h_offset, 'platform');
+    platforms.create(1270 + w_offset, 700 + h_offset, 'platform');
+    platforms.create(1342 + w_offset, 700 + h_offset, 'platform');
+    platforms.create(1414 + w_offset, 700 + h_offset, 'platform');
+    platforms.create(1486 + w_offset, 700 + h_offset, 'platform');
+    platforms.create(1558 + w_offset, 700 + h_offset, 'platform');
+    platforms.create(1630 + w_offset, 700 + h_offset, 'platform');
+    platforms.create(1702 + w_offset, 700 + h_offset, 'platform');
+    platforms.create(1774 + w_offset, 700 + h_offset, 'platform');
+    platforms.create(1846 + w_offset, 700 + h_offset, 'platform');
+
+    platforms.create(1080 + w_offset, 677 + h_offset, 'platform').setSize(1, 1000).setAngle(90);
+    platforms.create(1080 + w_offset, 605 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1080 + w_offset, 533 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1080 + w_offset, 461 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1080 + w_offset, 389 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1080 + w_offset, 317 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1080 + w_offset, 245 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1080 + w_offset, 173 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1080 + w_offset, 101 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1080 + w_offset, 29 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+
+    platforms.create(1893 + w_offset, 677 + h_offset, 'platform').setSize(1, 1000).setAngle(90);
+    platforms.create(1893 + w_offset, 605 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1893 + w_offset, 533 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1893 + w_offset, 461 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1893 + w_offset, 389 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1893 + w_offset, 317 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1893 + w_offset, 245 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1893 + w_offset, 173 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1893 + w_offset, 101 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+    platforms.create(1893 + w_offset, 29 + h_offset, 'platform').setSize(1, 1).setAngle(90);
+}
+
+function instanciate_player(gamePhysics){
+    player = myScene.physics.add.sprite(player_spawn_position.player_x, player_spawn_position.player_y, 'MrStonks').setScale(1.5, 1.5);
+    player.setCollideWorldBounds(true);
+
+    myScene.anims.create({
+        key: 'left',
+        frames: myScene.anims.generateFrameNumbers('MrStonks', { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    myScene.anims.create({
+        key: 'turnleft',
+        frames: [ { key: 'MrStonks', frame: 3 } ],
+        frameRate: 20
+    })
+
+    myScene.anims.create({
+        key: 'turnright',
+        frames: [ { key: 'MrStonks', frame: 4 } ],
+        frameRate: 20
+    });
+
+    myScene.anims.create({
+        key: 'right',
+        frames: myScene.anims.generateFrameNumbers('MrStonks', { start: 4, end: 7 }),
+        frameRate: 10,
+        repeat: -1
+    });
+}
+
+function player_movements(){
+    if (player.body.touching.down){
+        player_max_jump = 2;
+        player_has_jumped = false
+    }
+
+    if (cursors.left.isDown)
+    {
+        player.setVelocityX(-player_speed);
+
+        player.anims.play('left', true);
+
+        player_dir = 1;
+    }
+    else if (cursors.right.isDown)
+    {
+        player.setVelocityX(player_speed);
+
+        player.anims.play('right', true);
+
+        player_dir = 0;
+    }
+    else
+    {
+        player.setVelocityX(0);
+        
+        if(player_dir == 0){
+            player.anims.play('turnright');
+        }else{
+            player.anims.play('turnleft');
+        }
+        
+    }
+
+    if (!player_has_jumped && (cursors.up.isDown && (player.body.touching.down || player_max_jump > 0) ) )
+    {
+        player_has_jumped = true;
+        player_max_jump--;
+        player.setVelocityY(-player_jump_force);
+    }
+    if(cursors.up.isUp){
+        player_has_jumped = false;
+    }
+}
+
+function instanciate_iceblock(){
+    var x = Phaser.Math.Between(spawn_range.x1, spawn_range.x2);
+    var y = Phaser.Math.Between(spawn_range.y1, spawn_range.y2);
+
+    var new_iceblock = iceblocks.create(x, y, 'iceblock').setScale(1.5, 1.5);
+    new_iceblock.setCollideWorldBounds(true);
+    new_iceblock.setVelocity(0, 30);
+
+    myScene.time.delayedCall(iceblock_delay, instanciate_iceblock);
+    myScene.time.delayedCall(iceblock_lifetime, destroy_iceblock, [new_iceblock]);
+}
+
+function destroy_iceblock(iceblock){
+    iceblock.destroy();
+}
+
+function _on_player_hit_iceblock(player, iceblock){
+    iceblock.destroy();
+
+    myGameProgression.remove_gear( myGameProgression.get_gear() * 0.3 ); // removes 30% of current gear
+    myGameProgression.remove_xion( myGameProgression.get_xion() * 0.3 ); // removes 30% of current xion
+    console.log("@@@@@@@@@@@@@ !! ICEBLOCK HIT !! @@@@@@@@@@@@@@ ");
+
+    player.setTint(0xFF0000);
+    myScene.time.delayedCall(500, recolor_player);
+}
+
+function recolor_player(){
+    player.setTint(0xFFFFFF);
+}
+
+function instanciate_gears(){
+    var x = Phaser.Math.Between(spawn_range.x1, spawn_range.x2);
+    var y = Phaser.Math.Between(spawn_range.y1, spawn_range.y2);
+
+    var new_gear = gears.create(x, y, 'gear').setScale(1.5, 1.5);
+    new_gear.setBounce(0.85);
+    new_gear.setCollideWorldBounds(true);
+    new_gear.setVelocity(0, 50);
+
+    myScene.anims.create({
+        key: 'gearsRotation',
+        frames: myScene.anims.generateFrameNumbers('gear', { start: 0, end: 6 }),
+        frameRate: 10,
+        repeat: 9999
+    });
+
+    new_gear.anims.play('gearsRotation');
+
+    myScene.time.delayedCall(gear_lifetime, destroy_new_gear_if_lifetime, [new_gear])
+    myScene.time.delayedCall(spawn_delay, instanciate_gears)
+}
+
+function instanciate_golden_gears(){
+    var x = Phaser.Math.Between(spawn_range.x1, spawn_range.x2);
+    var y = Phaser.Math.Between(spawn_range.y1, spawn_range.y2);
+
+    var new_golden_gear = golden_gears.create(x, y, 'golden_gear').setScale(1.5, 1.5);
+    new_golden_gear.setBounce(0.85);
+    new_golden_gear.setCollideWorldBounds(true);
+    new_golden_gear.setVelocity(0, 50);
+
+    myScene.anims.create({
+        key: 'goldenGearRotation',
+        frames: myScene.anims.generateFrameNumbers('golden_gear', { start : 0, end : 6 }),
+        frameRate: 10,
+        repeat: 9999
+    });
+
+    new_golden_gear.anims.play('goldenGearRotation');
+
+    myScene.time.delayedCall(golden_gear_lifetime, destroy_new_gear_if_lifetime, [new_golden_gear])
+    myScene.time.delayedCall(golden_gear_spawn_delay, instanciate_golden_gears)
+}
+
+function destroy_new_gear_if_lifetime(gear){
+    gear.destroy();
+}
+
+function _on_gears_hit(player, gear_hit){
+    myGameProgression.add_gear(1);
+    gear_hit.destroy();
+    console.log(myGameProgression);
+}
+
+function _on_golden_gears_hit(player, golden_gear_hit){
+    myGameProgression.add_golden_gear(1);
+    golden_gear_hit.destroy();
+    console.log(myGameProgression);
 }

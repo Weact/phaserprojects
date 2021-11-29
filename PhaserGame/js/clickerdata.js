@@ -1,8 +1,13 @@
 class GameProgression{
-    constructor(xion = 0, gear = 0, golden_gear = 0, items = []){
+    constructor(xion = 0, gear = 0, golden_gear = 0, xion_lost_rate = 0.3, gear_lost_rate = 0.3, golden_gear_lost_rate = 0.3, items = []){
         this.xion = xion;
         this.gear = gear;
         this.golden_gear = golden_gear;
+
+        this.xion_lost_rate = xion_lost_rate;
+        this.gear_lost_rate = gear_lost_rate;
+        this.golden_gear_lost_rate = golden_gear_lost_rate;
+
         this.items = items;
     }
 
@@ -10,6 +15,9 @@ class GameProgression{
     set_xion(new_value = 0){
         this.xion = new_value;
         _on_xion_changed();
+    }
+    get_xion(){
+        return this.xion;
     }
     add_xion(value){
         this.xion = this.xion + value;
@@ -19,10 +27,7 @@ class GameProgression{
         this.xion = this.xion - value;
         _on_xion_changed();
     }
-    get_xion(){
-        return this.xion;
-    }
-
+    
     //GEAR
     set_gear(new_value){
         this.gear = new_value;
@@ -30,6 +35,14 @@ class GameProgression{
     }
     get_gear(){
         return this.gear;
+    }
+    add_gear(value){
+        this.gear = this.gear + value;
+        _on_gear_changed();
+    }
+    remove_gear(value){
+        this.gear = this.gear - value;
+        _on_gear_changed();
     }
 
     //GOLDEN GEAR
@@ -39,6 +52,14 @@ class GameProgression{
     }
     get_golden_gear(){
         return this.golden_gear;
+    }
+    add_golden_gear(value){
+        this.golden_gear = this.golden_gear + value;
+        _on_golden_gear_changed();
+    }
+    remove_golden_gear(value){
+        this.golden_gear = this.golden_gear - value;
+        _on_golden_gear_changed();
     }
 
     //ITEMS
@@ -82,7 +103,9 @@ class GameProgression{
         this.items.forEach(item => {
             if(item.get_name() != "xion" && this.get_xion() >= item.get_price()){
                 console.log(item.get_name() + " has been found as buyable !");
-                this.buy_item(item);
+                if(item.get_autobuy() == true){
+                    this.buy_item(item);
+                }
             }
         });
     }
@@ -97,7 +120,20 @@ class GameProgression{
 
         console.log(item + " has been bought for " + item_current_price + ". You now have " + item.get_player_owned() + ". Next price : " + item_next_price + ". Item earning per second: " + item.get_xion_per_second());
     }
+}
 
+class GameSettings{
+    constructor(autosave = false){
+        this.autosave = autosave;
+        this.autobuy = autobuy;
+    }
+
+    set_autosave(new_value){
+        this.autosave = new_value;
+    }
+    get_autosave(){
+        return this.autosave;
+    }
 }
 
 var game_progression = {
