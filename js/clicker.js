@@ -109,8 +109,8 @@ var golden_gear_lifetime = 2000;
 var buttons = {
     buyclicker: {x: 1500, y: 10, TextInfo: { x: 1515, y: 20, ftSize: '20px' } },
     buygenerator: {x: 1500, y: 75, TextInfo: { x: 1515, y: 85, ftSize: '20px' } },
-    buyextractor: {x: 1500, y: 140, TextInfo: { x: 1515, y: 150, ftSize: '20px' } },
-}
+    buyextractor: {x: 1500, y: 140, TextInfo: { x: 1515, y: 150, ftSize: '20px' } }
+};
 
 var buyclicker_text;
 var buygenerator_text;
