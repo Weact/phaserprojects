@@ -45,12 +45,7 @@ class item{
         return this.price;
     }
     update_price(){
-        console.log("initial cost : " + this.initial_cost);
-        console.log("price coeff : " + this.price_coeff);
-        console.log("player owned : " + this.player_owned);
-        console.log("previous price : " + this.get_price());
-        this.price = (this.initial_cost * (this.price_coeff ^ this.player_owned) ) // => ( Price = BaseCost * price_coeff ^ player_owned )
-        console.log("next price : " + this.get_price());
+        this.price = (this.initial_cost * Math.pow(this.price_coeff, this.player_owned) ) // => ( Price = BaseCost * price_coeff ^ player_owned )
     }
 
     set_upgrade_cost(new_value){
@@ -129,9 +124,11 @@ class item{
     // EVENTS
     _on_item_bought(){
         //this.set_price(this.price * this.price_coeff);
+        console.log("previous owned : " + this.player_owned);
         this.player_owned++;
         this.update_xion_per_second();
         this.update_price();
+        console.log("next owned : " + this.player_owned);
     }
 }
 
