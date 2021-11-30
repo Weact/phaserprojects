@@ -1,7 +1,8 @@
 class item{
-    constructor(price = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false){
+    constructor(initial_cost = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false){
         this.name = "";
-        this.price = price;
+        this.initial_cost = initial_cost; // => ( Price = initial_cost * price_coeff ^ player_owned )
+        this.price = 0;
         this.upgrade_cost = upgrade_cost;
         this.ultimate_upgrade_cost = ultimate_upgrade_cost;
         this.xion_amount = xion_amount; //xion quantity this item will give each generation
@@ -11,10 +12,13 @@ class item{
         this.autobuy = autobuy;
 
         this.xion_per_second = this.update_xion_per_second(); // item's xps = ( (xion_amount * quantity) * (delta/1000) )
+
+        this.update_price();
     }
 
-    set_item(price = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 0, multiplier = 0, player_owned = 0, autobuy = false){
-        this.price = price;
+    set_item(initial_cost = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 0, multiplier = 0, player_owned = 0, autobuy = false){
+        this.initial_cost = initial_cost;
+        this.price = 0;
         this.upgrade_cost = upgrade_cost;
         this.ultimate_upgrade_cost = ultimate_upgrade_cost;
         this.xion_amount = xion_amount;
@@ -23,6 +27,8 @@ class item{
         this.player_owned = player_owned;
         this.autobuy = autobuy;
         this.xion_per_second = this.update_xion_per_second();
+
+        this.update_price();
     }
 
     set_name(new_name){
@@ -37,6 +43,14 @@ class item{
     }
     get_price(){
         return this.price;
+    }
+    update_price(){
+        console.log("initial cost : " + this.initial_cost);
+        console.log("price coeff : " + this.price_coeff);
+        console.log("player owned : " + this.player_owned);
+        console.log("previous price : " + this.get_price());
+        this.price = (this.initial_cost * (this.price_coeff ^ this.player_owned) ) // => ( Price = BaseCost * price_coeff ^ player_owned )
+        console.log("next price : " + this.get_price());
     }
 
     set_upgrade_cost(new_value){
@@ -114,36 +128,41 @@ class item{
 
     // EVENTS
     _on_item_bought(){
-        this.set_price(this.price * this.price_coeff);
+        //this.set_price(this.price * this.price_coeff);
         this.player_owned++;
         this.update_xion_per_second();
+        this.update_price();
     }
 }
 
 class xion extends item{
-    constructor(initial_price = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 1, price_coeff = 0, multiplier = 1, player_owned = 1, autobuy = false){
-        super(initial_price, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
+    //(initial_cost = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false)
+    constructor(initial_cost = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 1, price_coeff = 0, multiplier = 1, player_owned = 1, autobuy = false){
+        super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
         this.name = "xion";
     }
 }
 
 class autoclicker extends item{
-    constructor(initial_price = 10, upgrade_cost = 10, ultimate_upgrade_cost = 5, xion_amount = 1, price_coeff = 1.08, multiplier = 1, player_owned = 0, autobuy = false){
-        super(initial_price, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
+    //(initial_cost = 0, price = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false)
+    constructor(initial_cost = 10, upgrade_cost = 10, ultimate_upgrade_cost = 5, xion_amount = 1, price_coeff = 1.08, multiplier = 1, player_owned = 0, autobuy = false){
+        super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
         this.name="autoclicker";
     }
 }
 
 class xiongenerator extends item{
-    constructor(initial_price = 1000, upgrade_cost = 50, ultimate_upgrade_cost = 20, xion_amount = 10, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false){
-        super(initial_price, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
+    //(initial_cost = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false)
+    constructor(initial_cost = 1000, upgrade_cost = 50, ultimate_upgrade_cost = 20, xion_amount = 10, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false){
+        super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
         this.name = "xiongenerator";
     }
 }
 
 class xionextractor extends item{
-    constructor(initial_price = 25000, upgrade_cost = 80, ultimate_upgrade_cost = 40, xion_amount = 300, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false){
-        super(initial_price, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
+    //(initial_cost = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false)
+    constructor(initial_cost = 25000, upgrade_cost = 80, ultimate_upgrade_cost = 40, xion_amount = 300, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false){
+        super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
         this.name = "xionextractor";
     }
 }

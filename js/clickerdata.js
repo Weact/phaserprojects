@@ -222,14 +222,14 @@ function set_progression_data(obj){
         const current_item = myGameProgression.get_item(item_index);
         
         current_item.set_item(
-            obj.items[item_index].price,
+            obj.items[item_index].initial_cost,
             obj.items[item_index].upgrade_cost,
             obj.items[item_index].ultimate_upgrade_cost,
             obj.items[item_index].xion_amount,
             obj.items[item_index].price_coeff,
             obj.items[item_index].multiplier,
             obj.items[item_index].player_owned,
-            obj.items[item_index].autobuy
+            obj.items[item_index].autobuy,
             );
     }
     
