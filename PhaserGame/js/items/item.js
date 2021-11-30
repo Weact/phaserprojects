@@ -12,6 +12,17 @@ class item{
         this.xion_per_second = this.update_xion_per_second(); // item's xps = ( (xion_amount * quantity) * (delta/1000) )
     }
 
+    set_item(price = 0, xion_amount = 0, price_coeff = 0, frequency = 0, multiplier = 0, player_owned = 0, autobuy = false){
+        this.price = price;
+        this.xion_amount = xion_amount;
+        this.price_coeff = price_coeff;
+        this.frequency = frequency;
+        this.multiplier = multiplier;
+        this.player_owned = player_owned;
+        this.autobuy = autobuy;
+        this.xion_per_second = this.update_xion_per_second();
+    }
+
     set_name(new_name){
         this.name = new_name;
     }
@@ -76,7 +87,9 @@ class item{
 
     // ITEM WILL BE AUTO BOUGHT IF TRUE
     set_autobuy(new_value){
-        this.autobuy = new_value;
+        if(new_value != this.autobuy){
+            this.autobuy = new_value;
+        }
     }
     get_autobuy(){
         return this.autobuy;
@@ -105,8 +118,15 @@ class autoclicker extends item{
 }
 
 class xiongenerator extends item{
-    constructor(initial_price = 1000, xion_amount = 10, price_coeff = 1.12, frequency = 4000.0, multiplier = 1, player_owned = 0, autobuy = false){
+    constructor(initial_price = 1000, xion_amount = 10, price_coeff = 1.12, frequency = 5000.0, multiplier = 1, player_owned = 0, autobuy = false){
         super(initial_price, xion_amount, price_coeff, frequency, multiplier, player_owned, autobuy);
         this.name = "xiongenerator";
+    }
+}
+
+class xionextractor extends item{
+    constructor(initial_price = 25000, xion_amount = 300, price_coeff = 1.12, frequency = 5000.0, multiplier = 1, player_owned = 0, autobuy = false){
+        super(initial_price, xion_amount, price_coeff, frequency, multiplier, player_owned, autobuy);
+        this.name = "xionextractor";
     }
 }

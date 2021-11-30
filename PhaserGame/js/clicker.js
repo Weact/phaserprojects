@@ -45,6 +45,7 @@ var myGameProgression = new GameProgression();
 var xion_object = new xion();
 var xion_autoclicker = new autoclicker();
 var xion_generator = new xiongenerator();
+var xion_extractor = new xionextractor();
 
 // XION
 var xion_image; //image
@@ -103,6 +104,22 @@ var golden_gear_spawn_delay = 60000;
 var gear_lifetime = 6000;
 var golden_gear_lifetime = 2000;
 
+/// BUTTONS
+
+var buttons = {
+    buyclicker: {x: 1500, y: 10, TextInfo: { x: 1515, y: 20, ftSize: '20px' } },
+    buygenerator: {x: 1500, y: 75, TextInfo: { x: 1515, y: 85, ftSize: '20px' } },
+    buyextractor: {x: 1500, y: 140, TextInfo: { x: 1515, y: 150, ftSize: '20px' } },
+}
+
+var buyclicker_text;
+var buygenerator_text;
+var buyextractor_text;
+
+var btn_autobuy_clicker;
+var btn_autobuy_generator;
+var btn_autobuy_extractor;
+
 // METHODS
 
 function preload(){
@@ -116,6 +133,11 @@ function preload(){
     this.load.spritesheet('gear', game_objects_path.gear.path, game_objects_path.gear.dim );
     this.load.spritesheet('golden_gear', game_objects_path.golden_gear.path, game_objects_path.golden_gear.dim );
     this.load.image('xion', game_objects_path.xion);
+
+    this.load.image('btn_buyclicker', game_objects_path.btn_buyclicker);
+    this.load.image('btn_buygenerator', game_objects_path.btn_buygenerator);
+    this.load.image('btn_buyextractor', game_objects_path.btn_buyextractor);
+    this.load.image('btn_autobuy', game_objects_path.btn_autobuy);
 
     this.load.image('platform', game_objects_path.xl_platform);
     this.load.image('iceblock', game_objects_path.ice_block);
@@ -132,7 +154,8 @@ function create(){
     golden_gears = this.physics.add.group();
     iceblocks = this.physics.add.group();
 
-    myGameProgression.set_items([xion_object, xion_autoclicker, xion_generator]);
+    myGameProgression.set_items([xion_object, xion_autoclicker, xion_generator, xion_extractor]);
+    console.log("items have been set");
 
     let bg_image = this.add.image(0, 0, 'game_background').setOrigin(0, 0);
     let bg_scaleX = this.cameras.main.width / bg_image.width
@@ -158,6 +181,47 @@ function create(){
     box_border_img.setDisplaySize(xion_x_max - xion_x_min, xion_y_max - xion_y_min);
     box_border_img.setDepth(1);
 
+    buyclicker_button = this.add.image(buttons.buyclicker.x, buttons.buyclicker.y, 'btn_buyclicker').setOrigin(0,0).setDepth(1000).setInteractive();
+    buyclicker_button.setTint(0xAAAAAA);
+    buyclicker_button.on('pointerdown', ( myPointer, objectsClicked ) => {
+            myGameProgression.buy_item(xion_autoclicker);
+        }
+    );
+
+    buygenerator_button = this.add.image(buttons.buygenerator.x, buttons.buygenerator.y, 'btn_buygenerator').setOrigin(0,0).setDepth(1000).setInteractive();
+    buygenerator_button.setTint(0xAAAAAA);
+    buygenerator_button.on('pointerdown', ( myPointer, objectsClicked ) => {
+        myGameProgression.buy_item(xion_generator);
+    });
+
+    buyextractor_button = this.add.image(buttons.buyextractor.x, buttons.buyextractor.y, 'btn_buyextractor').setOrigin(0,0).setDepth(1000).setInteractive();
+    buyextractor_button.setTint(0xAAAAAA);
+    buyextractor_button.on('pointerdown', ( myPointer, objectsClicked ) => {
+        myGameProgression.buy_item(xion_extractor);
+    });
+
+    autobuy_button_clicker = this.add.image(buttons.buyclicker.x - 90, buttons.buyclicker.y + 15, 'btn_autobuy').setOrigin(0, 0).setScale(0.4, 0.4).setDepth(1000).setInteractive();
+    autobuy_button_clicker.setTint(0x00CCFF);
+    autobuy_button_clicker.on('pointerdown', ( myPointer, objectsClicked ) => {
+        activate_autobuy(autobuy_button_clicker, xion_autoclicker);
+    } );
+
+    autobuy_button_generator = this.add.image(buttons.buygenerator.x - 90, buttons.buygenerator.y + 15, 'btn_autobuy').setOrigin(0, 0).setScale(0.4, 0.4).setDepth(1000).setInteractive();
+    autobuy_button_generator.setTint(0x00CCFF);
+    autobuy_button_generator.on('pointerdown', ( myPointer, objectsClicked ) => {
+        activate_autobuy(autobuy_button_generator, xion_generator);
+    } );
+
+    autobuy_button_extractor = this.add.image(buttons.buyextractor.x - 90, buttons.buyextractor.y + 15, 'btn_autobuy').setOrigin(0, 0).setScale(0.4, 0.4).setDepth(1000).setInteractive();
+    autobuy_button_extractor.setTint(0x00CCFF);
+    autobuy_button_extractor.on('pointerdown', ( myPointer, objectsClicked ) => {
+        activate_autobuy(autobuy_button_extractor, xion_extractor);
+    } );
+
+    buyclicker_text = this.add.text(buttons.buyclicker.TextInfo.x, buttons.buyclicker.TextInfo.y, '0', { fontSize: buttons.buyclicker.TextInfo.ftSize } ).setDepth(1001);
+    buygenerator_text = this.add.text(buttons.buygenerator.TextInfo.x, buttons.buygenerator.TextInfo.y, '0', { fontSize: buttons.buygenerator.TextInfo.ftSize } ).setDepth(1001);
+    buyextractor_text = this.add.text(buttons.buyextractor.TextInfo.x, buttons.buyextractor.TextInfo.y, '0', { fontSize: buttons.buyextractor.TextInfo.ftSize } ).setDepth(1001);
+
     instanciate_platforms();
     instanciate_player();
     this.time.delayedCall(spawn_delay, instanciate_gears);
@@ -175,7 +239,8 @@ function create(){
     mousePositionText = this.add.text(10, 920, '');
     this.input.mouse.disableContextMenu();
 
-    display_currencies();
+    display_buildings_cost_and_own();
+    refresh_ui();
     display_xps();
 }
 
@@ -208,7 +273,8 @@ function give_xion( item ){
 }
 
 function _on_xion_changed(){
-    myGameProgression.check_for_items();
+    let buyable_items = myGameProgression.check_for_items();
+    refresh_buy_buttons();
 }
 function _on_gear_changed(){
 }
@@ -245,14 +311,70 @@ function display_currencies(){
     display_xion();
     display_gear();
     display_golden_gear();
-    console.log(myGameProgression.get_xion());
-    myScene.time.delayedCall(24, display_currencies);
+}
+
+function refresh_buy_buttons(){
+    let buy_buttons = [buyclicker_button, buygenerator_button, buyextractor_button];
+    let current_xion = myGameProgression.get_xion();
+    var items = myGameProgression.get_items();
+
+    let buyableTint = 0xFFFFFF;
+    let unbuyableTint = 0xAAAAAA;
+
+    for (let i = 0; i < items.length; i++) {
+        const current_btn = buy_buttons[i-1];
+        const current_item = items[i];
+        
+
+        if(current_item.get_name() != "xion"){
+            if (current_xion >= current_item.get_price()) {
+                current_btn.setTint(buyableTint);
+            } else {
+                current_btn.setTint(unbuyableTint);
+            }
+        }
+    }
+}
+
+function refresh_ui(){
+    display_currencies();
+    myScene.time.delayedCall(24, refresh_ui);
 }
 
 function display_xps(){
 
     xps_text.text = xps + xps_text_base;
     myScene.time.delayedCall(1000, display_xps);
+}
+
+function display_buildings_cost_and_own(){
+    var btn_buyitems_text = [buyclicker_text, buygenerator_text, buyextractor_text];
+    var items = myGameProgression.get_items();
+
+    for (let i = 0; i < items.length; i++) {
+        const current_btn_text = btn_buyitems_text[i-1];
+        const current_item = items[i];
+        
+
+        if(current_item.get_name() != "xion"){
+            current_btn_text.setText(
+                [
+                    'cost: ' + Math.round(current_item.get_price(), 0),
+                    'owned: ' + Math.round(current_item.get_player_owned(),0)
+                ]
+            );
+        }
+    }
+}
+
+function activate_autobuy(autobuy_button, autobuy_item){
+    autobuy_item.set_autobuy( !autobuy_item.get_autobuy() );
+
+    if(autobuy_item.get_autobuy() == true){
+        autobuy_button.setTint(0x00FF00);
+    }else{
+        autobuy_button.setTint(0x00CCFF);
+    }
 }
 
 function get_total_earnings(){
@@ -407,7 +529,6 @@ function _on_player_hit_iceblock(player, iceblock){
 
     myGameProgression.remove_gear( myGameProgression.get_gear() * 0.3 ); // removes 30% of current gear
     myGameProgression.remove_xion( myGameProgression.get_xion() * 0.3 ); // removes 30% of current xion
-    console.log("@@@@@@@@@@@@@ !! ICEBLOCK HIT !! @@@@@@@@@@@@@@ ");
 
     player.setTint(0xFF0000);
     myScene.time.delayedCall(500, recolor_player);
@@ -468,11 +589,9 @@ function destroy_new_gear_if_lifetime(gear){
 function _on_gears_hit(player, gear_hit){
     myGameProgression.add_gear(1);
     gear_hit.destroy();
-    console.log(myGameProgression);
 }
 
 function _on_golden_gears_hit(player, golden_gear_hit){
     myGameProgression.add_golden_gear(1);
     golden_gear_hit.destroy();
-    console.log(myGameProgression);
 }
