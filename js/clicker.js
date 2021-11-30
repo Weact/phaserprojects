@@ -120,6 +120,8 @@ var btn_autobuy_clicker;
 var btn_autobuy_generator;
 var btn_autobuy_extractor;
 
+var btn_trade_gear_goldengear;
+
 // METHODS
 
 function preload(){
@@ -138,6 +140,7 @@ function preload(){
     this.load.image('btn_buygenerator', game_objects_path.btn_buygenerator);
     this.load.image('btn_buyextractor', game_objects_path.btn_buyextractor);
     this.load.image('btn_autobuy', game_objects_path.btn_autobuy);
+    this.load.image('btn_trade_gear_goldengear', game_objects_path.btn_trade_gear_goldengear);
 
     this.load.image('platform', game_objects_path.xl_platform);
     this.load.image('iceblock', game_objects_path.ice_block);
@@ -171,11 +174,11 @@ function create(){
     xion_collected_text = this.add.text(65, 0, myGameProgression.get_xion() , { fontSize: '50px', fill: '#FFF'});
     xps_text = this.add.text(80, 40, xps + xps_text_base, {fontSize: "20px", fill:"#FFF"} ) ;
 
-    this.add.image(35, 75, 'gear').setDepth(1000).setScale(1.2, 1.2);
-    gearText = this.add.text(65, 60, myGameProgression.get_gear(), {fontSize: '50px', fill: '#FFF'} );
+    this.add.image(350, 25, 'gear').setDepth(1000).setScale(1.4, 1.4);
+    gearText = this.add.text(385, 0, myGameProgression.get_gear(), {fontSize: '50px', fill: '#FFF'} );
 
-    this.add.image(35, 125, 'golden_gear').setDepth(1000).setScale(1.2, 1.2);
-    goldenGearText = this.add.text(65, 110, myGameProgression.get_golden_gear(), {fontSize: '50px', fill: '#FFF'} );
+    this.add.image(500, 25, 'golden_gear').setDepth(1000).setScale(1.4,1.4);
+    goldenGearText = this.add.text(535, 0, myGameProgression.get_golden_gear(), {fontSize: '50px', fill: '#FFF'} );
 
     let box_border_img = this.add.image(xion_x_min, xion_y_min, 'box_border').setOrigin(0,0);
     box_border_img.setDisplaySize(xion_x_max - xion_x_min, xion_y_max - xion_y_min);
@@ -216,6 +219,12 @@ function create(){
     autobuy_button_extractor.setTint(0x00CCFF);
     autobuy_button_extractor.on('pointerdown', ( myPointer, objectsClicked ) => {
         activate_autobuy(autobuy_button_extractor, xion_extractor);
+    } );
+
+    btn_trade_gear_goldengear = this.add.image(350, 75, 'btn_trade_gear_goldengear').setOrigin(0,0).setScale(1.5,1.5).setDepth(1000).setInteractive();
+    btn_trade_gear_goldengear.setTint(0x00CCFF);
+    btn_trade_gear_goldengear.on('pointerdown', ( myPointer, objectsClicked ) => {
+        trade_gear_to_goldengear();
     } );
 
     buyclicker_text = this.add.text(buttons.buyclicker.TextInfo.x, buttons.buyclicker.TextInfo.y, '0', { fontSize: buttons.buyclicker.TextInfo.ftSize } ).setDepth(1001);
@@ -277,8 +286,20 @@ function _on_xion_changed(){
     refresh_buy_buttons();
 }
 function _on_gear_changed(){
+    if(myGameProgression.get_gear() >= 10){
+        btn_trade_gear_goldengear.setTint(0xFFFFFF);
+    }else{
+        btn_trade_gear_goldengear.setTint(0x00CCFF);
+    }
 }
 function _on_golden_gear_changed(){
+}
+
+function trade_gear_to_goldengear(){
+    if (myGameProgression.get_gear() >= 10) {
+        myGameProgression.remove_gear(10);
+        myGameProgression.add_golden_gear(1);
+    }
 }
 
 function display_text(text, value, auto_hide = false, destroy = false){
@@ -527,8 +548,10 @@ function destroy_iceblock(iceblock){
 function _on_player_hit_iceblock(player, iceblock){
     iceblock.destroy();
 
-    myGameProgression.remove_gear( myGameProgression.get_gear() * 0.3 ); // removes 30% of current gear
-    myGameProgression.remove_xion( myGameProgression.get_xion() * 0.3 ); // removes 30% of current xion
+    myGameProgression.remove_gear( myGameProgression.get_gear() * myGameProgression.get_gear_lost_rate() ); // removes 15% of current gear
+    myGameProgression.remove_golden_gear( myGameProgression.get_golden_gear() * myGameProgression.get_golden_gear_lost_rate() ); // removes 5% of current golden gear
+    myGameProgression.remove_xion( myGameProgression.get_xion() * myGameProgression.get_xion_lost_rate() ); // removes 30% of current xion
+
 
     player.setTint(0xFF0000);
     myScene.time.delayedCall(500, recolor_player);

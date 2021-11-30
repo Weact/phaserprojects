@@ -1,5 +1,5 @@
 class GameProgression{
-    constructor(xion = 0, gear = 0, golden_gear = 0, xion_lost_rate = 0.3, gear_lost_rate = 0.3, golden_gear_lost_rate = 0.3, items = []){
+    constructor(xion = 0, gear = 0, golden_gear = 0, xion_lost_rate = 0.3, gear_lost_rate = 0.15, golden_gear_lost_rate = 0.05, items = []){
         this.xion = xion;
         this.gear = gear;
         this.golden_gear = golden_gear;
@@ -22,6 +22,9 @@ class GameProgression{
         if(this.xion_lost_rate != new_value){
             this.xion_lost_rate = new_value;
         }
+    }
+    get_xion_lost_rate(){
+        return this.xion_lost_rate;
     }
     get_xion(){
         return this.xion;
@@ -51,6 +54,9 @@ class GameProgression{
             this.gear_lost_rate = new_value;
         }
     }
+    get_gear_lost_rate(){
+        return this.gear_lost_rate;
+    }
     get_gear(){
         return this.gear;
     }
@@ -74,6 +80,9 @@ class GameProgression{
         if(this.set_golden_gear_lost_rate != new_value){
             this.set_golden_gear_lost_rate = new_value;
         }
+    }
+    get_golden_gear_lost_rate(){
+        return this.golden_gear_lost_rate;
     }
     get_golden_gear(){
         return this.golden_gear;
