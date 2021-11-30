@@ -127,7 +127,7 @@ class GameProgression{
     }
 
     check_for_items(){
-        let buyable_items = []
+        let buyable_items = [];
 
         this.items.forEach(item => {
             if(item.get_name() != "xion" && this.get_xion() >= item.get_price()){
@@ -155,26 +155,6 @@ class GameProgression{
             display_buildings_cost_and_own();
         }
     }
-}
-
-var game_progression = {
-    xion: 0,
-
-    gear: 0,
-    golden_gear: 0,
-
-    multiplier: 1.0,
-
-
-    upgrade_one_bought: false,
-    upgrade_two_bought: false,
-    upgrade_three_bought: false,
-    upgrade_four_bought: false,
-
-    autoclick_enabled: false,
-    autoclick_frequency: 5000,
-
-    items: [] //0: xion 1: autoclicker 2: generator
 }
 
 function save_game(el){
@@ -207,10 +187,21 @@ function download_json(json, el){
 }
 
 function set_progression_data(obj){
-    //console.log("Keys: " + Object.keys(obj));
-    //console.log("Values: " + Object.values(obj));
+    console.log(obj);
 
-    let new_items = obj.items;
+    for (let item_index = 0; item_index < myGameProgression.get_items().length; item_index++) {
+        const current_item = myGameProgression.get_item(item_index);
+        
+        current_item.set_item(
+            obj.items[item_index].price,
+            obj.items[item_index].xion_amount,
+            obj.items[item_index].price_coeff,
+            obj.items[item_index].frequency,
+            obj.items[item_index].multiplier,
+            obj.items[item_index].player_owned,
+            obj.items[item_index].autobuy
+            );
+    }
     
     Object.keys(obj).forEach(obj_keys => {
         let setter = `set_${obj_keys}`;
@@ -223,10 +214,9 @@ function set_progression_data(obj){
             case 'set_xion_lost_rate': myGameProgression.set_xion_lost_rate(value); break;
             case 'set_gear_lost_rate': myGameProgression.set_gear_lost_rate(value); break;
             case 'set_golden_gear_lost_rate': myGameProgression.set_golden_gear_lost_rate(value); break;
-            case 'set_items': myGameProgression.set_items(new_items); break;
-            default: console.log("#### WARNING : INVALID SETTER ####"); break;
+            default: console.log("#### WARNING : INVALID SETTER #### : " + setter); break;
         }
     });
 
-    refresh_ui();
+    display_buildings_cost_and_own();
 }

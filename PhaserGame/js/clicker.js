@@ -149,18 +149,13 @@ function create(){
     gameTime = Date.now();
     cursors = this.input.keyboard.createCursorKeys();
 
-    //xion_object = myGameProgression.get_item_by_name('xion');
-    //xion_autoclicker = myGameProgression.get_item_by_name('autoclicker');
-    //xion_generator = myGameProgression.get_item_by_name('generator');
-    //xion_extractor = myGameProgression.get_item_by_name('extractor');
-
-
     platforms = this.physics.add.staticGroup();
     gears = this.physics.add.group();
     golden_gears = this.physics.add.group();
     iceblocks = this.physics.add.group();
 
     myGameProgression.set_items([xion_object, xion_autoclicker, xion_generator, xion_extractor]);
+    console.log("items have been set");
 
     let bg_image = this.add.image(0, 0, 'game_background').setOrigin(0, 0);
     let bg_scaleX = this.cameras.main.width / bg_image.width

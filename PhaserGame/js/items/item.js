@@ -12,6 +12,17 @@ class item{
         this.xion_per_second = this.update_xion_per_second(); // item's xps = ( (xion_amount * quantity) * (delta/1000) )
     }
 
+    set_item(price = 0, xion_amount = 0, price_coeff = 0, frequency = 0, multiplier = 0, player_owned = 0, autobuy = false){
+        this.price = price;
+        this.xion_amount = xion_amount;
+        this.price_coeff = price_coeff;
+        this.frequency = frequency;
+        this.multiplier = multiplier;
+        this.player_owned = player_owned;
+        this.autobuy = autobuy;
+        this.xion_per_second = this.update_xion_per_second();
+    }
+
     set_name(new_name){
         this.name = new_name;
     }
