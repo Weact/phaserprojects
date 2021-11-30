@@ -30,7 +30,6 @@ var stars_n = 11;
 var stars_a = stars_n + 1;
 var star_score_value = 1;
 
-var     ;
 var bombs_n = 1;
 
 var score_text;
