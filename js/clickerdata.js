@@ -1,5 +1,5 @@
 class GameProgression{
-    constructor(xion = 0, gear = 0, golden_gear = 0, xion_lost_rate = 0.3, gear_lost_rate = 0.3, golden_gear_lost_rate = 0.3, items = []){
+    constructor(xion = 0, gear = 0, golden_gear = 0, xion_lost_rate = 0.3, gear_lost_rate = 0.15, golden_gear_lost_rate = 0.05, items = []){
         this.xion = xion;
         this.gear = gear;
         this.golden_gear = golden_gear;
@@ -22,6 +22,9 @@ class GameProgression{
         if(this.xion_lost_rate != new_value){
             this.xion_lost_rate = new_value;
         }
+    }
+    get_xion_lost_rate(){
+        return this.xion_lost_rate;
     }
     get_xion(){
         return this.xion;
@@ -51,6 +54,9 @@ class GameProgression{
             this.gear_lost_rate = new_value;
         }
     }
+    get_gear_lost_rate(){
+        return this.gear_lost_rate;
+    }
     get_gear(){
         return this.gear;
     }
@@ -71,9 +77,12 @@ class GameProgression{
         }
     }
     set_golden_gear_lost_rate(new_value){
-        if(this.set_golden_gear_lost_rate != new_value){
-            this.set_golden_gear_lost_rate = new_value;
+        if(this.golden_gear_lost_rate != new_value){
+            this.golden_gear_lost_rate = new_value;
         }
+    }
+    get_golden_gear_lost_rate(){
+        return this.golden_gear_lost_rate;
     }
     get_golden_gear(){
         return this.golden_gear;
@@ -155,6 +164,26 @@ class GameProgression{
             display_buildings_cost_and_own();
         }
     }
+
+    upgrade_item(item, ultimate_upgrade = false){
+        if(item != undefined){
+            if(ultimate_upgrade == false){
+                if(this.get_gear() >= item.get_upgrade_cost()){
+                    this.remove_gear(item.get_upgrade_cost());
+                    item.add_multiplier(1);
+                    item.set_upgrade_cost( item.get_upgrade_cost() + 5 );
+                }
+            }else{
+                if(this.get_golden_gear() >= item.get_ultimate_upgrade_cost()){
+                        this.remove_golden_gear(item.get_ultimate_upgrade_cost());
+                        item.add_multiplier(10);
+                        item.set_ultimate_upgrade_cost( item.get_ultimate_upgrade_cost() + 20 )
+                }
+            }
+
+            display_buildings_upgrades_cost_and_own();
+        }
+    }
 }
 
 function save_game(el){
@@ -194,9 +223,10 @@ function set_progression_data(obj){
         
         current_item.set_item(
             obj.items[item_index].price,
+            obj.items[item_index].upgrade_cost,
+            obj.items[item_index].ultimate_upgrade_cost,
             obj.items[item_index].xion_amount,
             obj.items[item_index].price_coeff,
-            obj.items[item_index].frequency,
             obj.items[item_index].multiplier,
             obj.items[item_index].player_owned,
             obj.items[item_index].autobuy
@@ -209,14 +239,18 @@ function set_progression_data(obj){
 
         switch (setter) {
             case 'set_xion': myGameProgression.set_xion(value); break;
+            case 'set_upgrade_cost': myGameProgression.set_upgrade_cost(value); break;
+            case 'set_ultimate_upgrade_cost': myGameProgression.set_ultimate_upgrade_cost(value); value;
             case 'set_gear': myGameProgression.set_gear(value); break;
             case 'set_golden_gear': myGameProgression.set_golden_gear(value); break;
             case 'set_xion_lost_rate': myGameProgression.set_xion_lost_rate(value); break;
             case 'set_gear_lost_rate': myGameProgression.set_gear_lost_rate(value); break;
             case 'set_golden_gear_lost_rate': myGameProgression.set_golden_gear_lost_rate(value); break;
+            case 'set_items': break;
             default: console.log("#### WARNING : INVALID SETTER #### : " + setter); break;
         }
     });
 
     display_buildings_cost_and_own();
+    display_buildings_upgrades_cost_and_own();
 }
