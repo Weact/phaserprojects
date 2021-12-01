@@ -226,48 +226,54 @@ function create(){
     // generator: [buttons.buygenerator, buygenerator_text, btn_autobuy_generator, btn_upgrade_xiongenerator],
     // extractor: [buttons.buyextractor, buyextractor_text, btn_autobuy_extractor, btn_upgrade_xionextractor]
 
-    display_buttons(true);
+    display_buttons(true); // <= Show or hide every button group
+    //display_button_group('gbtn_generator', false); // <= Chose a specific button group to hide or show
 }
 
 function display_buttons(value) {
-    display_button_group('gbtn_extractor', false);
-    // Object.values(buy_buttons_group).forEach(button => {
-    //     // console.log("btn : " + Object.keys(buy_buttons_group));
-    //     // console.log(Object.keys(buy_buttons_group)[0] == 'gbtn_autoclicker');
-    //     // console.log( Object.keys(buy_buttons_group)[0]);
+     Object.values(buy_buttons_group).forEach(button => {
+         Object.keys(button).forEach(element => {
+             button[element].visible = value;
+         });
+     });
 
-    //     Object.keys(button).forEach(element => {
-    //         button[element].visible = value;
-    //     });
-    // });
+     let items_upgrades_text_group = [items_upgrades_text.upgrade_clicker_text.cost,
+                                items_upgrades_text.upgrade_clicker_text.owned,
+                                items_upgrades_text.upgrade_generator_text.cost,
+                                items_upgrades_text.upgrade_generator_text.owned,
+                                items_upgrades_text.upgrade_extractor_text.cost,
+                                items_upgrades_text.upgrade_extractor_text.owned];
 
-    // items_upgrades_text.upgrade_clicker_text.cost.visible = value;
-    // items_upgrades_text.upgrade_clicker_text.owned.visible = value;
+     items_upgrades_text_group.forEach((item_text, index) => {
+       item_text.visible = value;
+     });
 
-    // items_upgrades_text.upgrade_generator_text.cost.visible = value;
-    // items_upgrades_text.upgrade_generator_text.owned.visible = value;
-
-    // items_upgrades_text.upgrade_extractor_text.cost.visible = value;
-    // items_upgrades_text.upgrade_extractor_text.owned.visible = value;
 }
 
+//note to myself: this function is shit and I shouldn't have done it like this, so static and ugly
 function display_button_group(button_group = '', value = false){
-    console.log(Object.keys(buy_buttons_group));
+    if(button_group == 'gbtn_autoclicker'){
+      buy_buttons_group.gbtn_autoclicker.forEach((item, i) => {
+        buy_buttons_group.gbtn_autoclicker[i].visible = false;
+      });
 
-    Object.values(buy_buttons_group).forEach(button => {
-        //console.log("btn : " + Object.keys(buy_buttons_group));
-        //console.log(Object.keys(buy_buttons_group)[0] == 'gbtn_autoclicker');
-        //console.log( Object.keys(buy_buttons_group)[0]);
+      items_upgrades_text.upgrade_clicker_text.cost.visible = value;
+      items_upgrades_text.upgrade_clicker_text.owned.visible = value;
+    }else if (button_group == 'gbtn_generator'){
+      buy_buttons_group.gbtn_generator.forEach((item, i) => {
+        buy_buttons_group.gbtn_generator[i].visible = false;
+      });
 
-        for (let index = 0; index < Object.keys(buy_buttons_group).length; index++) {
-            const e = Object.keys(buy_buttons_group)[index];
-            if(e == button_group){
-                Object.keys(button).forEach(element => {
-                    button[element].visible = value;
-                });
-            }
-        }
-    });
+      items_upgrades_text.upgrade_generator_text.cost.visible = value;
+      items_upgrades_text.upgrade_generator_text.owned.visible = value;
+    }else if (button_group == 'gbtn_extractor') {
+      buy_buttons_group.gbtn_extractor.forEach((item, i) => {
+        buy_buttons_group.gbtn_extractor[i].visible = false;
+      });
+
+      items_upgrades_text.upgrade_extractor_text.cost.visible = value;
+      items_upgrades_text.upgrade_extractor_text.owned.visible = value;
+    }
 }
 
 function update(time, delta){
@@ -543,7 +549,7 @@ function refresh_buy_buttons(){
     for (let i = 0; i < items.length; i++) {
         const current_btn = buy_buttons[i-1];
         const current_item = items[i];
-        
+
 
         if(current_item.get_name() != "xion"){
             if (current_xion >= current_item.get_price()) {
@@ -583,7 +589,7 @@ function display_buildings_cost_and_own(){
     for (let i = 0; i < items.length; i++) {
         const current_btn_text = btn_buyitems_text[i-1];
         const current_item = items[i];
-        
+
 
         if(current_item.get_name() != "xion"){
             current_btn_text.setText(
@@ -728,13 +734,13 @@ function player_movements(){
     else
     {
         player.setVelocityX(0);
-        
+
         if(player_dir == 0){
             player.anims.play('turnright');
         }else{
             player.anims.play('turnleft');
         }
-        
+
     }
 
     if (!player_has_jumped && (cursors.up.isDown && (player.body.touching.down || player_max_jump > 0) ) )
