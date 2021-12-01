@@ -124,17 +124,15 @@ class item{
     // EVENTS
     _on_item_bought(){
         //this.set_price(this.price * this.price_coeff);
-        console.log("previous owned : " + this.player_owned);
         this.player_owned++;
         this.update_xion_per_second();
         this.update_price();
-        console.log("next owned : " + this.player_owned);
     }
 }
 
 class xion extends item{
     //(initial_cost = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false)
-    constructor(initial_cost = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 1, price_coeff = 0, multiplier = 1, player_owned = 1, autobuy = false){
+    constructor(initial_cost = 150, upgrade_cost = 100, ultimate_upgrade_cost = 30, xion_amount = 1, price_coeff = 1.15, multiplier = 1, player_owned = 1, autobuy = false){
         super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
         this.name = "xion";
     }
@@ -142,7 +140,7 @@ class xion extends item{
 
 class autoclicker extends item{
     //(initial_cost = 0, price = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false)
-    constructor(initial_cost = 10, upgrade_cost = 10, ultimate_upgrade_cost = 5, xion_amount = 1, price_coeff = 1.08, multiplier = 1, player_owned = 0, autobuy = false){
+    constructor(initial_cost = 20, upgrade_cost = 10, ultimate_upgrade_cost = 5, xion_amount = 1, price_coeff = 1.07, multiplier = 1, player_owned = 0, autobuy = false){
         super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
         this.name="autoclicker";
     }
@@ -150,7 +148,7 @@ class autoclicker extends item{
 
 class xiongenerator extends item{
     //(initial_cost = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false)
-    constructor(initial_cost = 1000, upgrade_cost = 50, ultimate_upgrade_cost = 20, xion_amount = 10, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false){
+    constructor(initial_cost = 300, upgrade_cost = 40, ultimate_upgrade_cost = 15, xion_amount = 5, price_coeff = 1.08, multiplier = 1, player_owned = 0, autobuy = false){
         super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
         this.name = "xiongenerator";
     }
@@ -158,8 +156,50 @@ class xiongenerator extends item{
 
 class xionextractor extends item{
     //(initial_cost = 0, upgrade_cost = 0, ultimate_upgrade_cost = 0, xion_amount = 0, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false)
-    constructor(initial_cost = 25000, upgrade_cost = 80, ultimate_upgrade_cost = 40, xion_amount = 300, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false){
+    constructor(initial_cost = 4000, upgrade_cost = 160, ultimate_upgrade_cost = 45, xion_amount = 25, price_coeff = 1.09, multiplier = 1, player_owned = 0, autobuy = false){
         super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
         this.name = "xionextractor";
+    }
+}
+
+class xionbabybot extends item{
+    constructor(initial_cost = 50000, upgrade_cost = 480, ultimate_upgrade_cost = 90, xion_amount = 125, price_coeff = 1.10, multiplier = 1, player_owned = 0, autobuy = false){
+        super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
+        this.name = "xionbabybot";
+    }
+}
+
+class xioncloud extends item{
+    constructor(initial_cost = 535535, upgrade_cost = 720, ultimate_upgrade_cost = 195, xion_amount = 700, price_coeff = 1.11, multiplier = 1, player_owned = 0, autobuy = false){
+        super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
+        this.name = "xioncloud";
+    }
+}
+
+class xionlaboratory extends item{
+    constructor(initial_cost = 8999999, upgrade_cost = 1500, ultimate_upgrade_cost = 340, xion_amount = 4200, price_coeff = 1.11, multiplier = 1, player_owned = 0, autobuy = false){
+        super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
+        this.name = "xionlaboratory";
+    }
+}
+
+class xionchamber extends item{
+    constructor(initial_cost = 99999999, upgrade_cost = 9999, ultimate_upgrade_cost = 999, xion_amount = 39700, price_coeff = 1.12, multiplier = 1, player_owned = 0, autobuy = false){
+        super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
+        this.name = "xionchamber";
+    }
+}
+
+class xionsystemhack extends item{
+    constructor(initial_cost = 133713371, upgrade_cost = 9999, ultimate_upgrade_cost = 999, xion_amount = 69420, price_coeff = 1.13, multiplier = 1, player_owned = 0, autobuy = false){
+        super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
+        this.name = "xionsystemhack";
+    }
+}
+
+class xionmatter extends item{
+    constructor(initial_cost = 571596158, upgrade_cost = 9999, ultimate_upgrade_cost = 999, xion_amount = 349876, price_coeff = 1.14, multiplier = 1, player_owned = 0, autobuy = false){
+        super(initial_cost, upgrade_cost, ultimate_upgrade_cost, xion_amount, price_coeff, multiplier, player_owned, autobuy);
+        this.name = "xionmatter";
     }
 }
