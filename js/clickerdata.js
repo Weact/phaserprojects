@@ -176,10 +176,21 @@ class GameProgression{
             }else{
                 if(this.get_golden_gear() >= item.get_ultimate_upgrade_cost()){
                         this.remove_golden_gear(item.get_ultimate_upgrade_cost());
-                        item.add_multiplier(10);
-                        item.set_ultimate_upgrade_cost( item.get_ultimate_upgrade_cost() + 20 )
+                        item.add_multiplier(50);
                 }
             }
+            display_buildings_upgrades_cost_and_own();
+        }
+        update_clicker_upgrade_button();
+        update_generator_upgrade_button();
+        update_extractor_upgrade_button();
+    }
+
+    is_item_max_level(item){
+        if(item.get_multiplier() == 100){
+            return true;
+        }else{
+            return false;
         }
     }
 }
