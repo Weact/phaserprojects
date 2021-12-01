@@ -180,8 +180,6 @@ class GameProgression{
                         item.set_ultimate_upgrade_cost( item.get_ultimate_upgrade_cost() + 20 )
                 }
             }
-
-            display_buildings_upgrades_cost_and_own();
         }
     }
 }
@@ -216,7 +214,6 @@ function download_json(json, el){
 }
 
 function set_progression_data(obj){
-    console.log(obj);
 
     for (let item_index = 0; item_index < myGameProgression.get_items().length; item_index++) {
         const current_item = myGameProgression.get_item(item_index);

@@ -170,7 +170,6 @@ function create(){
     iceblocks = this.physics.add.group();
 
     myGameProgression.set_items([xion_object, xion_autoclicker, xion_generator, xion_extractor]);
-    console.log("items have been set");
 
     let bg_image = this.add.image(0, 0, 'game_background').setOrigin(0, 0);
     let bg_scaleX = this.cameras.main.width / bg_image.width
@@ -316,6 +315,10 @@ function update_pointer(){
     mousePositionText.setText( ['x: ' + myPointer.worldX,'y: ' + myPointer.worldY ] );
 }
 
+function instanciate_buttons(){
+
+}
+
 function _on_xion_clicked(_pointer = undefined, _pointer_x = undefined, _pointer_y = undefined, _propagation = undefined, by_autoclicker = false){
     give_xion(xion_object);
 
@@ -333,7 +336,7 @@ function _on_xion_changed(){
     refresh_buy_buttons();
 }
 function _on_gear_changed(){
-    if(myGameProgression.get_gear() > 9){
+    if(myGameProgression.get_gear() >= 10){
         btn_trade_gear_goldengear.setTint(0xFFFFFF);
     }else{
         btn_trade_gear_goldengear.setTint(0x00CCFF);
@@ -357,9 +360,10 @@ function _on_gear_changed(){
         btn_upgrade_xionextractor.setTint(0xFF0000);
     }
 
-
+    display_buildings_upgrades_cost_and_own();
 }
 function _on_golden_gear_changed(){
+    display_buildings_upgrades_cost_and_own();
 }
 
 function trade_gear_to_goldengear(){
