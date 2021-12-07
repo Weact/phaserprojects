@@ -649,7 +649,7 @@ function give_xion( item ){
 }
 
 function play_collect_xion_sound(){
-    clickxion.setDetune(Phaser.Math.Between(-500, 500));
+    clickxion.setDetune(Phaser.Math.Between(-200, 200));
     clickxion.play();
 }
 
