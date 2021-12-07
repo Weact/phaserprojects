@@ -297,6 +297,8 @@ function create(){
     display_buttons(true); // <= Show or hide every button group
     //display_button_group('gbtn_generator', false); // <= Chose a specific button group to hide or show
     display_button_group('gbtn_babybot', false);
+
+    btn_trade_gear_goldengear.setVisible(false);
 }
 
 function check_for_collectables_and_progression(){
@@ -649,7 +651,7 @@ function give_xion( item ){
 }
 
 function play_collect_xion_sound(){
-    clickxion.setDetune(Phaser.Math.Between(-500, 500));
+    clickxion.setDetune(Phaser.Math.Between(-200, 200));
     clickxion.play();
 }
 
@@ -727,10 +729,11 @@ function update_clicker_upgrade_button() {
 }
 
 function trade_gear_to_goldengear(){
-    if (myGameProgression.get_gear() >= 10) {
-        myGameProgression.remove_gear(10);
-        myGameProgression.add_golden_gear(1);
-    }
+
+    // if (myGameProgression.get_gear() >= 10) {
+    //     myGameProgression.remove_gear(10);
+    //     myGameProgression.add_golden_gear(1);
+    // }
 }
 
 function display_text(text, value, auto_hide = false, destroy = false){ // CURRENTLY NEVER USED ; KEEP IT FOR THE FUTURE IF AIMING TO INCLUDE TEMPORARY MESSAGES ON SCREEN
