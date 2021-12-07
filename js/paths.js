@@ -21,9 +21,13 @@ var game_objects_path = {
     btn_buyclicker: assets_clicker_path + "UI/BuyClickerButton.png",
     btn_buyextractor: assets_clicker_path + "UI/BuyExtractorButton.png",
     btn_buygenerator: assets_clicker_path + "UI/BuyGeneratorButton.png",
+    btn_buybabybot: assets_clicker_path + "UI/BuyBabyBot.png",
     btn_autobuy: assets_clicker_path + "UI/AutoBuy.png",
     btn_trade_gear_goldengear: assets_clicker_path + "UI/GearTradeGoldenGear.png",
     btn_upgrade_items: assets_clicker_path + "UI/UpgradeBuildingButton.png",
+    btn_speedup_collectables: assets_clicker_path + "UI/SpeedUpCollectables.png",
+    btn_speedup_goldengear: assets_clicker_path + "UI/SpeedUpGoldenGear.png",
+    btn_cursor: assets_clicker_path + "UI/btn_cursor.png",
 
     //PLAYER
     mrstonks: { path : assets_clicker_path + "Player/MrStonksSheet.png" , dim: { frameWidth : 64 , frameHeight : 48 } }

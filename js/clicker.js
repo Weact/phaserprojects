@@ -49,6 +49,7 @@ var xion_object = new xion();
 var xion_autoclicker = new autoclicker();
 var xion_generator = new xiongenerator();
 var xion_extractor = new xionextractor();
+var xion_babybot = new xionbabybot();
 
 // XION
 var xion_image; //image
@@ -102,31 +103,52 @@ var goldenGearText;
 var gears;
 var golden_gears;
 var spawn_range = {x1: 920, x2: 1640, y1: 150, y2: 250};
-var spawn_delay = 5000;
-var golden_gear_spawn_delay = 60000;
+var spawn_delay = 5000; //gear spawn delay
+var golden_gear_spawn_delay = 60000; //golden gear spawn delay
 var gear_lifetime = 6000;
 var golden_gear_lifetime = 2000;
+
+var cost_gear_speedup = 100;
+var coeff_gear_speedup = 1.04;
+var gearTimesSpeedUp = 0;
+var price_gear_speedup = cost_gear_speedup * Math.pow(coeff_gear_speedup, gearTimesSpeedUp);
+var geartextprice;
+var geartextowned;
+var geartextdelay;
+
+var cost_goldengear_speedup = 500;
+var coeff_goldengear_speedup = 1.08;
+var goldengearTimesSpeedUp = 0;
+var price_goldengear_speedup = cost_goldengear_speedup * Math.pow(coeff_goldengear_speedup, goldengearTimesSpeedUp);
+var goldengeartextprice;
+var goldengeartextowned;
+var goldengeartextdelay;
 
 /// BUTTONS
 var buyclicker_button;
 var buygenerator_button;
 var buyextractor_button;
+var buybabybot_button;
 
 var buy_buttons = [];
 
 var buttons = {
     buyclicker: {x: 1500, y: 10, TextInfo: { x: 1515, y: 20, ftSize: '20px' } },
     buygenerator: {x: 1500, y: 75, TextInfo: { x: 1515, y: 85, ftSize: '20px' } },
-    buyextractor: {x: 1500, y: 140, TextInfo: { x: 1515, y: 150, ftSize: '20px' } }
+    buyextractor: {x: 1500, y: 140, TextInfo: { x: 1515, y: 150, ftSize: '20px' } },
+    buybabybot: {x: 1500, y: 10, TextInfo: { x: 1515, y: 20, ftSize: '20px' } } 
+
 };
 
 var buyclicker_text;
 var buygenerator_text;
 var buyextractor_text;
+var buybabybot_text;
 
 var btn_autobuy_clicker;
 var btn_autobuy_generator;
 var btn_autobuy_extractor;
+var btn_autobuy_babybot;
 
 var btn_trade_gear_goldengear;
 
@@ -134,17 +156,31 @@ var btn_upgrade_items;
 var btn_upgrade_autoclicker;
 var btn_upgrade_xiongenerator;
 var btn_upgrade_xionextractor;
+var btn_upgrade_xionbabybot;
+
+var btn_cursor_upgrade
+var cursorpricetext
+var cursorownedtext
+
+var btn_speedup_collectables;
 
 var items_upgrades_text = {
-    upgrade_clicker_text: { cost: { x: 1250, y: 25, text: 'cost:' }, owned: { x: 1250, y: 39, text: 'owned:' } },
-    upgrade_generator_text: { cost: { x: 1250, y: 85, text: 'cost:' }, owned: {x: 1250, y: 99, text: 'owned:' } },
-    upgrade_extractor_text: { cost: { x: 1250, y: 155, text: 'cost:' }, owned: {x: 1250, y: 169, text: 'owned:' } }
+    upgrade_clicker_text: { cost: { x: 1250, y: 25, e_text: 'cost:' }, owned: { x: 1250, y: 39, e_text: 'owned:' } },
+    upgrade_generator_text: { cost: { x: 1250, y: 85, e_text: 'cost:' }, owned: {x: 1250, y: 99, e_text: 'owned:' } },
+    upgrade_extractor_text: { cost: { x: 1250, y: 155, e_text: 'cost:' }, owned: {x: 1250, y: 169, e_text: 'owned:' } },
+    upgrade_babybot_text: { cost: { x: 1250, y: 25, e_text: 'cost:' }, owned: { x: 1250, y: 39, e_text: 'owned:' } }
+}
+
+var gearsSpeedupText = {
+    speedup_gear_text: { cost: { x: 240, y: 50, e_text: 'cost:' }, owned: { x: 240, y: 65, e_text: 'owned:' }, delay: {x: 240, y: 80, e_text: 'delay:'} },
+    speedup_goldengear_text: { cost: { x: 550, y: 50, e_text: 'cost:' }, owned: { x: 550, y: 65, e_text: 'owned:' }, delay: {x: 550, y: 80, e_text: 'delay:'} }
 }
 
 var buy_buttons_group = {
     gbtn_autoclicker: [],
     gbtn_generator: [],
-    gbtn_extractor: []
+    gbtn_extractor: [],
+    gbtn_babybot: []
 }
 
 // METHODS
@@ -164,9 +200,14 @@ function preload(){
     myScene.load.image('btn_buyclicker', game_objects_path.btn_buyclicker);
     myScene.load.image('btn_buygenerator', game_objects_path.btn_buygenerator);
     myScene.load.image('btn_buyextractor', game_objects_path.btn_buyextractor);
+    myScene.load.image('btn_buybabybot', game_objects_path.btn_buybabybot);
     myScene.load.image('btn_autobuy', game_objects_path.btn_autobuy);
     myScene.load.image('btn_trade_gear_goldengear', game_objects_path.btn_trade_gear_goldengear);
     myScene.load.image('btn_upgrade_items', game_objects_path.btn_upgrade_items);
+    myScene.load.image('btn_speedup_collectables', game_objects_path.btn_speedup_collectables);
+    myScene.load.image('btn_speedup_goldengear', game_objects_path.btn_speedup_goldengear);
+
+    myScene.load.image('btn_cursor', game_objects_path.btn_cursor);
 
     myScene.load.image('platform', game_objects_path.xl_platform);
     myScene.load.image('iceblock', game_objects_path.ice_block);
@@ -183,7 +224,9 @@ function create(){
     golden_gears = myScene.physics.add.group();
     iceblocks = myScene.physics.add.group();
 
-    myGameProgression.set_items([xion_object, xion_autoclicker, xion_generator, xion_extractor]);
+    myGameProgression.set_items([xion_object, xion_autoclicker, xion_generator, xion_extractor, xion_babybot]);
+
+    check_for_collectables_and_progression();
 
     create_game_background();
     create_xion_clicker();
@@ -193,7 +236,11 @@ function create(){
     create_autoclicker_buttons();
     create_generator_buttons();
     create_extractor_buttons();
+    create_babybot_buttons();
     create_trade_buttons();
+    create_speedup_button();
+    create_goldengear_speedup_button();
+    create_cursor_upgrade();
 
     instanciate_platforms();
     instanciate_player();
@@ -215,19 +262,43 @@ function create(){
 
     display_buildings_cost_and_own();
     refresh_ui();
+    refresh_buy_buttons();
+    update_speedUp_texts();
     display_xps();
     display_buildings_upgrades_cost_and_own();
 
     buy_buttons_group.gbtn_autoclicker = [buyclicker_button, buttons.buyclicker, buyclicker_text, btn_autobuy_clicker, btn_upgrade_autoclicker];
     buy_buttons_group.gbtn_generator = [buygenerator_button, buttons.buygenerator, buygenerator_text, btn_autobuy_generator, btn_upgrade_xiongenerator];
     buy_buttons_group.gbtn_extractor = [buyextractor_button, buttons.buyextractor, buyextractor_text, btn_autobuy_extractor, btn_upgrade_xionextractor];
-
-    // autoclicker: [buttons.buyclicker, buyclicker_text, btn_autobuy_clicker, btn_upgrade_autoclicker],
-    // generator: [buttons.buygenerator, buygenerator_text, btn_autobuy_generator, btn_upgrade_xiongenerator],
-    // extractor: [buttons.buyextractor, buyextractor_text, btn_autobuy_extractor, btn_upgrade_xionextractor]
+    buy_buttons_group.gbtn_babybot = [buybabybot_button, buttons.buybabybot, buybabybot_text, btn_autobuy_babybot, btn_upgrade_xionbabybot];
 
     display_buttons(true); // <= Show or hide every button group
     //display_button_group('gbtn_generator', false); // <= Chose a specific button group to hide or show
+    display_button_group('gbtn_babybot', false);
+}
+
+function check_for_collectables_and_progression(){
+    if (myGameProgression.geardelay != 0 || myGameProgression.gearowned != 0 || myGameProgression.goldengeardelay != 0 || myGameProgression.goldengearowned != 0) {
+        spawn_delay = myGameProgression.geardelay;
+        gearTimesSpeedUp = myGameProgression.gearowned;
+        golden_gear_spawn_delay = myGameProgression.goldengeardelay;
+        goldengearTimesSpeedUp = myGameProgression.goldengearowned;
+    }else{
+        spawn_delay = 5000;
+        gearTimesSpeedUp = 0;
+        golden_gear_spawn_delay = 60000;
+        goldengearTimesSpeedUp = 0;
+    }
+}
+
+function create_cursor_upgrade(){
+    btn_cursor_upgrade = myScene.add.image(900, 10, 'btn_cursor').setScale(3, 2).setOrigin(0,0).setDepth(1000).setInteractive();
+    btn_cursor_upgrade.on('pointerdown', (myPointer, objectsClicked) => {
+        myGameProgression.buy_item(xion_object);
+    })
+
+    cursorpricetext = myScene.add.text(890, 90, 'cost:' + xion_object.get_price() );
+    cursorownedtext = myScene.add.text(890, 110, 'level:' + xion_object.get_player_owned() );
 }
 
 function display_buttons(value) {
@@ -242,12 +313,13 @@ function display_buttons(value) {
                                 items_upgrades_text.upgrade_generator_text.cost,
                                 items_upgrades_text.upgrade_generator_text.owned,
                                 items_upgrades_text.upgrade_extractor_text.cost,
-                                items_upgrades_text.upgrade_extractor_text.owned];
+                                items_upgrades_text.upgrade_extractor_text.owned,
+                                items_upgrades_text.upgrade_babybot_text.cost,
+                                items_upgrades_text.upgrade_babybot_text.owned];
 
      items_upgrades_text_group.forEach((item_text, index) => {
        item_text.visible = value;
      });
-
 }
 
 //note to myself: this function is shit and I shouldn't have done it like this, so static and ugly
@@ -273,8 +345,15 @@ function display_button_group(button_group = '', value = false){
 
       items_upgrades_text.upgrade_extractor_text.cost.visible = value;
       items_upgrades_text.upgrade_extractor_text.owned.visible = value;
+    }else if (button_group == 'gbtn_babybot') {
+        buy_buttons_group.gbtn_babybot.forEach((item, i) => {
+          buy_buttons_group.gbtn_babybot[i].visible = false;
+        });
+  
+        items_upgrades_text.upgrade_babybot_text.cost.visible = value;
+        items_upgrades_text.upgrade_babybot_text.owned.visible = value;
+      }
     }
-}
 
 function update(time, delta){
     gameTimeCurrent = Date.now();
@@ -288,8 +367,77 @@ function update(time, delta){
     update_pointer();
 }
 
+function create_speedup_button(){
+    btn_speedup_collectables = myScene.add.image(255, 0, 'btn_speedup_collectables').setScale(1.3,1.3).setOrigin(0,0).setDepth(1000).setInteractive();
+    btn_speedup_collectables.on('pointerdown', (myPointer, objectsClicked) => {
+        speedUp_collectable();
+    })
+
+    geartextprice = myScene.add.text(gearsSpeedupText.speedup_gear_text.cost.x, gearsSpeedupText.speedup_gear_text.cost.y, gearsSpeedupText.speedup_gear_text.cost.e_text);
+    geartextowned = myScene.add.text(gearsSpeedupText.speedup_gear_text.owned.x, gearsSpeedupText.speedup_gear_text.owned.y, gearsSpeedupText.speedup_gear_text.owned.e_text);
+    geartextdelay = myScene.add.text(gearsSpeedupText.speedup_gear_text.delay.x, gearsSpeedupText.speedup_gear_text.delay.y, gearsSpeedupText.speedup_gear_text.delay.e_text + 'ms');
+}
+
+function create_goldengear_speedup_button(){
+    btn_speedup_goldengear = myScene.add.image(580, 0, 'btn_speedup_goldengear').setScale(1.3,1.3).setOrigin(0,0).setDepth(1000).setInteractive();
+    btn_speedup_goldengear.on('pointerdown', (myPointer, objectsClicked) => {
+        speedUp_collectable('goldengear');
+    })
+
+    goldengeartextprice = myScene.add.text(gearsSpeedupText.speedup_goldengear_text.cost.x, gearsSpeedupText.speedup_goldengear_text.cost.y, gearsSpeedupText.speedup_goldengear_text.cost.e_text);
+    goldengeartextowned = myScene.add.text(gearsSpeedupText.speedup_goldengear_text.owned.x, gearsSpeedupText.speedup_goldengear_text.owned.y, gearsSpeedupText.speedup_goldengear_text.owned.e_text);
+    goldengeartextdelay = myScene.add.text(gearsSpeedupText.speedup_goldengear_text.delay.x, gearsSpeedupText.speedup_goldengear_text.delay.y, gearsSpeedupText.speedup_goldengear_text.delay.e_text + 'ms');
+}
+
+function speedUp_collectable(collectable = ''){
+    if(collectable == 'goldengear'){
+        if(myGameProgression.get_xion() >= price_goldengear_speedup){
+            if(golden_gear_spawn_delay >= 6000){
+                collectable_speedup_bought('goldengear');
+            }
+        }
+    }else{
+        if(myGameProgression.get_xion() >= price_gear_speedup){
+            if(spawn_delay >= 400){
+                collectable_speedup_bought();
+            }
+        }
+    }
+}
+
+function update_speedUp_texts(){
+    geartextprice.setText(gearsSpeedupText.speedup_gear_text.cost.e_text + Math.round(price_gear_speedup, 0) );
+    geartextowned.setText(gearsSpeedupText.speedup_gear_text.owned.e_text + gearTimesSpeedUp);
+    geartextdelay.setText(gearsSpeedupText.speedup_gear_text.delay.e_text + spawn_delay + 'ms');
+
+    goldengeartextprice.setText(gearsSpeedupText.speedup_goldengear_text.cost.e_text + Math.round(price_goldengear_speedup,0) );
+    goldengeartextowned.setText(gearsSpeedupText.speedup_goldengear_text.owned.e_text + goldengearTimesSpeedUp);
+    goldengeartextdelay.setText(gearsSpeedupText.speedup_goldengear_text.delay.e_text + golden_gear_spawn_delay + 'ms');
+
+    myGameProgression.geardelay = spawn_delay;
+    myGameProgression.gearowned = gearTimesSpeedUp;
+    myGameProgression.goldengeardelay = golden_gear_spawn_delay;
+    myGameProgression.goldengearowned = goldengearTimesSpeedUp;
+}
+
+function collectable_speedup_bought(collectable = ''){
+    if(collectable == 'goldengear'){
+        myGameProgression.remove_xion(price_goldengear_speedup);
+        golden_gear_spawn_delay -= 1000;
+        goldengearTimesSpeedUp++;
+        price_goldengear_speedup = cost_goldengear_speedup * Math.pow(coeff_goldengear_speedup, goldengearTimesSpeedUp);
+    }else{
+        myGameProgression.remove_xion(price_gear_speedup);
+        spawn_delay -= 100;
+        gearTimesSpeedUp++;
+        price_gear_speedup = cost_gear_speedup * Math.pow(coeff_gear_speedup, gearTimesSpeedUp);
+    }
+
+    update_speedUp_texts();
+}
+
 function create_trade_buttons() {
-    btn_trade_gear_goldengear = myScene.add.image(350, 75, 'btn_trade_gear_goldengear').setOrigin(0, 0).setScale(1.5, 1.5).setDepth(1000).setInteractive();
+    btn_trade_gear_goldengear = myScene.add.image(360, 75, 'btn_trade_gear_goldengear').setOrigin(0, 0).setScale(1.5, 1.5).setDepth(1000).setInteractive();
     btn_trade_gear_goldengear.setTint(0x00CCFF);
     btn_trade_gear_goldengear.on('pointerdown', (myPointer, objectsClicked) => {
         trade_gear_to_goldengear();
@@ -298,6 +446,7 @@ function create_trade_buttons() {
     buyclicker_text = myScene.add.text(buttons.buyclicker.TextInfo.x, buttons.buyclicker.TextInfo.y, '0', { fontSize: buttons.buyclicker.TextInfo.ftSize }).setDepth(1001);
     buygenerator_text = myScene.add.text(buttons.buygenerator.TextInfo.x, buttons.buygenerator.TextInfo.y, '0', { fontSize: buttons.buygenerator.TextInfo.ftSize }).setDepth(1001);
     buyextractor_text = myScene.add.text(buttons.buyextractor.TextInfo.x, buttons.buyextractor.TextInfo.y, '0', { fontSize: buttons.buyextractor.TextInfo.ftSize }).setDepth(1001);
+    buybabybot_text = myScene.add.text(buttons.buybabybot.TextInfo.x, buttons.buybabybot.TextInfo.y, '0', { fontSize : buttons.buybabybot.TextInfo.ftSize }).setDepth(1001);
 }
 
 function create_autoclicker_buttons() {
@@ -320,8 +469,32 @@ function create_autoclicker_buttons() {
         upgrade_item_level(xion_autoclicker);
     });
 
-    items_upgrades_text.upgrade_clicker_text.cost = myScene.add.text(items_upgrades_text.upgrade_clicker_text.cost.x, items_upgrades_text.upgrade_clicker_text.cost.y, items_upgrades_text.upgrade_clicker_text.cost.text);
-    items_upgrades_text.upgrade_clicker_text.owned = myScene.add.text(items_upgrades_text.upgrade_clicker_text.owned.x, items_upgrades_text.upgrade_clicker_text.owned.y, items_upgrades_text.upgrade_clicker_text.owned.text);
+    items_upgrades_text.upgrade_clicker_text.cost = myScene.add.text(items_upgrades_text.upgrade_clicker_text.cost.x, items_upgrades_text.upgrade_clicker_text.cost.y, items_upgrades_text.upgrade_clicker_text.cost.e_text);
+    items_upgrades_text.upgrade_clicker_text.owned = myScene.add.text(items_upgrades_text.upgrade_clicker_text.owned.x, items_upgrades_text.upgrade_clicker_text.owned.y, items_upgrades_text.upgrade_clicker_text.owned.e_text);
+}
+
+function create_autoclicker_buttons() {
+    buyclicker_button = myScene.add.image(buttons.buyclicker.x, buttons.buyclicker.y, 'btn_buyclicker').setOrigin(0, 0).setDepth(1000).setInteractive();
+    buyclicker_button.setTint(0xAAAAAA);
+    buyclicker_button.on('pointerdown', (myPointer, objectsClicked) => {
+        myGameProgression.buy_item(xion_autoclicker);
+    }
+    );
+
+    btn_autobuy_clicker = myScene.add.image(buttons.buyclicker.x - 90, buttons.buyclicker.y + 15, 'btn_autobuy').setOrigin(0, 0).setScale(0.4, 0.4).setDepth(1000).setInteractive();
+    btn_autobuy_clicker.setTint(0x00CCFF);
+    btn_autobuy_clicker.on('pointerdown', (myPointer, objectsClicked) => {
+        activate_autobuy(btn_autobuy_clicker, xion_autoclicker);
+    });
+
+    btn_upgrade_autoclicker = myScene.add.image(buttons.buyclicker.x - 160, buttons.buyclicker.y + 4, 'btn_upgrade_items').setOrigin(0, 0).setScale(0.7, 0.7).setDepth(1000).setInteractive();
+    btn_upgrade_autoclicker.setTint(0xFF0000);
+    btn_upgrade_autoclicker.on('pointerdown', (myPointer, objectsClicked) => {
+        upgrade_item_level(xion_autoclicker);
+    });
+
+    items_upgrades_text.upgrade_clicker_text.cost = myScene.add.text(items_upgrades_text.upgrade_clicker_text.cost.x, items_upgrades_text.upgrade_clicker_text.cost.y, items_upgrades_text.upgrade_clicker_text.cost.e_text);
+    items_upgrades_text.upgrade_clicker_text.owned = myScene.add.text(items_upgrades_text.upgrade_clicker_text.owned.x, items_upgrades_text.upgrade_clicker_text.owned.y, items_upgrades_text.upgrade_clicker_text.owned.e_text);
 }
 
 function create_generator_buttons() {
@@ -343,8 +516,31 @@ function create_generator_buttons() {
         upgrade_item_level(xion_generator);
     });
 
-    items_upgrades_text.upgrade_generator_text.cost = myScene.add.text(items_upgrades_text.upgrade_generator_text.cost.x, items_upgrades_text.upgrade_generator_text.cost.y, items_upgrades_text.upgrade_generator_text.cost.text);
-    items_upgrades_text.upgrade_generator_text.owned = myScene.add.text(items_upgrades_text.upgrade_generator_text.owned.x, items_upgrades_text.upgrade_generator_text.owned.y, items_upgrades_text.upgrade_generator_text.owned.text);
+    items_upgrades_text.upgrade_generator_text.cost = myScene.add.text(items_upgrades_text.upgrade_generator_text.cost.x, items_upgrades_text.upgrade_generator_text.cost.y, items_upgrades_text.upgrade_generator_text.cost.e_text);
+    items_upgrades_text.upgrade_generator_text.owned = myScene.add.text(items_upgrades_text.upgrade_generator_text.owned.x, items_upgrades_text.upgrade_generator_text.owned.y, items_upgrades_text.upgrade_generator_text.owned.e_text);
+}
+
+function create_babybot_buttons() {
+    buybabybot_button = myScene.add.image(buttons.buybabybot.x, buttons.buybabybot.y, 'btn_buybabybot').setOrigin(0, 0).setDepth(1000).setInteractive();
+    buybabybot_button.setTint(0xAAAAAA);
+    buybabybot_button.on('pointerdown', (myPointer, objectsClicked) => {
+        myGameProgression.buy_item(xion_babybot);
+    });
+
+    btn_autobuy_babybot = myScene.add.image(buttons.buybabybot.x - 90, buttons.buybabybot.y + 15, 'btn_autobuy').setOrigin(0, 0).setScale(0.4, 0.4).setDepth(1000).setInteractive();
+    btn_autobuy_babybot.setTint(0x00CCFF);
+    btn_autobuy_babybot.on('pointerdown', (myPointer, objectsClicked) => {
+        activate_autobuy(btn_autobuy_babybot, xion_babybot);
+    });
+
+    btn_upgrade_xionbabybot = myScene.add.image(buttons.buybabybot.x - 160, buttons.buybabybot.y + 4, 'btn_upgrade_items').setOrigin(0, 0).setScale(0.7, 0.7).setDepth(1000).setInteractive();
+    btn_upgrade_xionbabybot.setTint(0xFF0000);
+    btn_upgrade_xionbabybot.on('pointerdown', (myPointer, objectsClicked) => {
+        upgrade_item_level(xion_babybot);
+    });
+
+    items_upgrades_text.upgrade_babybot_text.cost = myScene.add.text(items_upgrades_text.upgrade_babybot_text.cost.x, items_upgrades_text.upgrade_babybot_text.cost.y, items_upgrades_text.upgrade_babybot_text.cost.e_text);
+    items_upgrades_text.upgrade_babybot_text.owned = myScene.add.text(items_upgrades_text.upgrade_babybot_text.owned.x, items_upgrades_text.upgrade_babybot_text.owned.y, items_upgrades_text.upgrade_babybot_text.owned.e_text);
 }
 
 function create_extractor_buttons() {
@@ -366,8 +562,8 @@ function create_extractor_buttons() {
         upgrade_item_level(xion_extractor);
     });
 
-    items_upgrades_text.upgrade_extractor_text.cost = myScene.add.text(items_upgrades_text.upgrade_extractor_text.cost.x, items_upgrades_text.upgrade_extractor_text.cost.y, items_upgrades_text.upgrade_extractor_text.cost.text);
-    items_upgrades_text.upgrade_extractor_text.owned = myScene.add.text(items_upgrades_text.upgrade_extractor_text.owned.x, items_upgrades_text.upgrade_extractor_text.owned.y, items_upgrades_text.upgrade_extractor_text.owned.text);
+    items_upgrades_text.upgrade_extractor_text.cost = myScene.add.text(items_upgrades_text.upgrade_extractor_text.cost.x, items_upgrades_text.upgrade_extractor_text.cost.y, items_upgrades_text.upgrade_extractor_text.cost.e_text);
+    items_upgrades_text.upgrade_extractor_text.owned = myScene.add.text(items_upgrades_text.upgrade_extractor_text.owned.x, items_upgrades_text.upgrade_extractor_text.owned.y, items_upgrades_text.upgrade_extractor_text.owned.e_text);
 }
 
 function upgrade_item_level(item){
@@ -425,7 +621,12 @@ function _on_xion_clicked(_pointer = undefined, _pointer_x = undefined, _pointer
 }
 
 function give_xion( item ){
-    myGameProgression.add_xion(item.xion_amount * item.multiplier * item.player_owned);
+    if(item.get_name() != "xion"){
+        myGameProgression.add_xion(item.xion_amount * item.multiplier * item.player_owned);
+    }else{
+        myGameProgression.add_xion(item.xion_amount * item.multiplier);
+    }
+    
 }
 
 function _on_xion_changed(){
@@ -443,11 +644,13 @@ function _on_gear_changed(){
     update_generator_upgrade_button();
     update_extractor_upgrade_button();
 }
+
 function _on_golden_gear_changed(){
     update_clicker_upgrade_button();
     update_generator_upgrade_button();
     update_extractor_upgrade_button();
 }
+
 function update_extractor_upgrade_button() {
     if (myGameProgression.get_gear() >= xion_extractor.get_upgrade_cost() && xion_extractor.get_multiplier() <= 49) {
         btn_upgrade_xionextractor.setTint(0xFFFFFF);
@@ -484,7 +687,6 @@ function update_generator_upgrade_button() {
 
 function update_clicker_upgrade_button() {
     if (myGameProgression.get_gear() >= xion_autoclicker.get_upgrade_cost() && xion_autoclicker.get_multiplier() <= 49) {
-        console.log(xion_autoclicker.get_multiplier());
         btn_upgrade_autoclicker.setTint(0xFFFFFF);
     } else {
         if (xion_autoclicker.get_multiplier() < 50) {
@@ -539,7 +741,7 @@ function display_currencies(){
 }
 
 function refresh_buy_buttons(){
-    buy_buttons = [buyclicker_button, buygenerator_button, buyextractor_button];
+    buy_buttons = [buyclicker_button, buygenerator_button, buyextractor_button, buybabybot_button];
     let current_xion = myGameProgression.get_xion();
     var items = myGameProgression.get_items();
 
@@ -569,6 +771,17 @@ function refresh_buy_buttons(){
     if(myGameProgression.is_item_max_level(xion_extractor)){
         btn_upgrade_xionextractor.setTint(0x000000);
     }
+
+    if(myGameProgression.get_xion() >= price_gear_speedup){
+        btn_speedup_collectables.setTint(0xFFFFFF);
+    }else{
+        btn_speedup_collectables.setTint(0xFF0000);
+    }
+    if(myGameProgression.get_xion() >= price_goldengear_speedup){
+        btn_speedup_goldengear.setTint(0xFFFFFF);
+    }else{
+        btn_speedup_goldengear.setTint(0xFF0000);
+    }
 }
 
 function refresh_ui(){
@@ -583,13 +796,12 @@ function display_xps(){
 }
 
 function display_buildings_cost_and_own(){
-    var btn_buyitems_text = [buyclicker_text, buygenerator_text, buyextractor_text];
+    var btn_buyitems_text = [buyclicker_text, buygenerator_text, buyextractor_text, buybabybot_text];
     var items = myGameProgression.get_items();
 
     for (let i = 0; i < items.length; i++) {
         const current_btn_text = btn_buyitems_text[i-1];
         const current_item = items[i];
-
 
         if(current_item.get_name() != "xion"){
             current_btn_text.setText(
@@ -598,6 +810,9 @@ function display_buildings_cost_and_own(){
                     'owned: ' + Math.round(current_item.get_player_owned(),0)
                 ]
             );
+        }else{
+            cursorpricetext.setText('cost:' + Math.round(xion_object.get_price(), 0));
+            cursorownedtext.setText('level:' + Math.round(xion_object.get_player_owned(), 0));
         }
     }
 }

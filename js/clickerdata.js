@@ -8,6 +8,11 @@ class GameProgression{
         this.gear_lost_rate = gear_lost_rate;
         this.golden_gear_lost_rate = golden_gear_lost_rate;
 
+        this.geardelay = 0;
+        this.gearowned = 0;
+        this.goldengeardelay = 0;
+        this.goldengearowned = 0;
+
         this.items = items;
     }
 
@@ -68,6 +73,12 @@ class GameProgression{
         this.gear = this.gear - value;
         _on_gear_changed();
     }
+    set_geardelay(value){
+        this.geardelay = value;
+    }
+    set_gearowned(value){
+        this.gearowned = value;
+    }
 
     //GOLDEN GEAR
     set_golden_gear(new_value){
@@ -94,6 +105,12 @@ class GameProgression{
     remove_golden_gear(value){
         this.golden_gear = this.golden_gear - value;
         _on_golden_gear_changed();
+    }
+    set_goldengeardelay(value){
+        this.goldengeardelay = value;
+    }
+    set_goldengearowned(value){
+        this.goldengearowned = value;
     }
 
     //ITEMS
@@ -255,10 +272,16 @@ function set_progression_data(obj){
             case 'set_gear_lost_rate': myGameProgression.set_gear_lost_rate(value); break;
             case 'set_golden_gear_lost_rate': myGameProgression.set_golden_gear_lost_rate(value); break;
             case 'set_items': break;
+            case 'set_geardelay': myGameProgression.set_geardelay(value); break;
+            case 'set_gearowned': myGameProgression.set_gearowned(value); break;
+            case 'set_goldengeardelay': myGameProgression.set_goldengeardelay(value); break;
+            case 'set_goldengearowned': myGameProgression.set_goldengearowned(value); break;
             default: console.log("#### WARNING : INVALID SETTER #### : " + setter); break;
         }
     });
 
     display_buildings_cost_and_own();
     display_buildings_upgrades_cost_and_own();
+    check_for_collectables_and_progression();
+    update_speedUp_texts();
 }
