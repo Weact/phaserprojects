@@ -184,6 +184,13 @@ var buy_buttons_group = {
     gbtn_babybot: []
 }
 
+// SOUNDS
+var player_hit_iceblock;
+var clickxion;
+
+var cam;
+var camshake;
+
 // METHODS
 
 function preload(){
@@ -214,11 +221,25 @@ function preload(){
     myScene.load.image('iceblock', game_objects_path.ice_block);
 
     myScene.load.spritesheet('MrStonks', game_objects_path.mrstonks.path, game_objects_path.mrstonks.dim);
+
+    this.load.audio('bgm', ['assets/clicker/audio/bgmxionleak.ogg']);
+    this.load.audio('clickxion', ['assets/clicker/audio/clickxion.ogg']);
+    this.load.audio('playerhiticeblock', ['assets/clicker/audio/playerhiticeblock.ogg']);
 }
 
 function create(){
     gameTime = Date.now();
     cursors = myScene.input.keyboard.createCursorKeys();
+
+    var bgmxionleak = this.sound.add('bgm', {volume: 0.2});
+    bgmxionleak.loop = true;
+    bgmxionleak.play();
+
+    player_hit_iceblock = this.sound.add('playerhiticeblock', {volume: 0.7});
+    player_hit_iceblock.loop = false;
+
+    clickxion = this.sound.add('clickxion', {volume: 0.7});
+    clickxion.loop = false;
 
     platforms = myScene.physics.add.staticGroup();
     gears = myScene.physics.add.group();
@@ -276,7 +297,6 @@ function create(){
     display_buttons(true); // <= Show or hide every button group
     //display_button_group('gbtn_generator', false); // <= Chose a specific button group to hide or show
     display_button_group('gbtn_babybot', false);
-
 }
 
 function check_for_collectables_and_progression(){
@@ -612,10 +632,12 @@ function update_pointer(){ // TO BE REMOVED
 
 function _on_xion_clicked(_pointer = undefined, _pointer_x = undefined, _pointer_y = undefined, _propagation = undefined, by_autoclicker = false){
     give_xion(xion_object);
-
+    
     if(by_autoclicker == false){
         replace_xion();
     }
+
+    play_collect_xion_sound();
 }
 
 function give_xion( item ){
@@ -623,8 +645,12 @@ function give_xion( item ){
         myGameProgression.add_xion(item.xion_amount * item.multiplier * item.player_owned);
     }else{
         myGameProgression.add_xion(item.xion_amount * item.multiplier);
-    }
-    
+    }    
+}
+
+function play_collect_xion_sound(){
+    clickxion.setDetune(Phaser.Math.Between(-500, 500));
+    clickxion.play();
 }
 
 function _on_xion_changed(){
@@ -985,6 +1011,9 @@ function destroy_iceblock(iceblock){
 
 function _on_player_hit_iceblock(player, iceblock){
     iceblock.destroy();
+
+    player_hit_iceblock.play();
+    myScene.cameras.main.shake(300, 0.01, true);
 
     myGameProgression.remove_gear( myGameProgression.get_gear() * myGameProgression.get_gear_lost_rate() ); // removes 15% of current gear
     myGameProgression.remove_golden_gear( myGameProgression.get_golden_gear() * myGameProgression.get_golden_gear_lost_rate() ); // removes 5% of current golden gear
