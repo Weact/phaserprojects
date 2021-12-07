@@ -428,11 +428,11 @@ function speedUp_collectable(collectable = ''){
 function update_speedUp_texts(){
     geartextprice.setText(gearsSpeedupText.speedup_gear_text.cost.e_text + Math.round(price_gear_speedup, 0) );
     geartextowned.setText(gearsSpeedupText.speedup_gear_text.owned.e_text + gearTimesSpeedUp);
-    geartextdelay.setText(gearsSpeedupText.speedup_gear_text.delay.e_text + spawn_delay + 'ms');
+    geartextdelay.setText(gearsSpeedupText.speedup_gear_text.delay.e_text + Math.round(spawn_delay,0) + 'ms');
 
     goldengeartextprice.setText(gearsSpeedupText.speedup_goldengear_text.cost.e_text + Math.round(price_goldengear_speedup,0) );
     goldengeartextowned.setText(gearsSpeedupText.speedup_goldengear_text.owned.e_text + goldengearTimesSpeedUp);
-    goldengeartextdelay.setText(gearsSpeedupText.speedup_goldengear_text.delay.e_text + golden_gear_spawn_delay + 'ms');
+    goldengeartextdelay.setText(gearsSpeedupText.speedup_goldengear_text.delay.e_text + Math.round(golden_gear_spawn_delay,0) + 'ms');
 
     myGameProgression.geardelay = spawn_delay;
     myGameProgression.gearowned = gearTimesSpeedUp;
