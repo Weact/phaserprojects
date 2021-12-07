@@ -1,4 +1,5 @@
 var config = {
+    key: "gameclicker",
     type: Phaser.AUTO,
     width: 1920,
     height: 968,
@@ -108,16 +109,16 @@ var golden_gear_spawn_delay = 60000; //golden gear spawn delay
 var gear_lifetime = 6000;
 var golden_gear_lifetime = 2000;
 
-var cost_gear_speedup = 100;
-var coeff_gear_speedup = 1.04;
+var cost_gear_speedup = 1000;
+var coeff_gear_speedup = 1.2;
 var gearTimesSpeedUp = 0;
 var price_gear_speedup = cost_gear_speedup * Math.pow(coeff_gear_speedup, gearTimesSpeedUp);
 var geartextprice;
 var geartextowned;
 var geartextdelay;
 
-var cost_goldengear_speedup = 500;
-var coeff_goldengear_speedup = 1.08;
+var cost_goldengear_speedup = 5000;
+var coeff_goldengear_speedup = 1.2;
 var goldengearTimesSpeedUp = 0;
 var price_goldengear_speedup = cost_goldengear_speedup * Math.pow(coeff_goldengear_speedup, goldengearTimesSpeedUp);
 var goldengeartextprice;
@@ -392,15 +393,11 @@ function create_goldengear_speedup_button(){
 function speedUp_collectable(collectable = ''){
     if(collectable == 'goldengear'){
         if(myGameProgression.get_xion() >= price_goldengear_speedup){
-            if(golden_gear_spawn_delay >= 6000){
-                collectable_speedup_bought('goldengear');
-            }
+            collectable_speedup_bought('goldengear');
         }
     }else{
         if(myGameProgression.get_xion() >= price_gear_speedup){
-            if(spawn_delay >= 400){
-                collectable_speedup_bought();
-            }
+            collectable_speedup_bought();
         }
     }
 }
@@ -423,12 +420,12 @@ function update_speedUp_texts(){
 function collectable_speedup_bought(collectable = ''){
     if(collectable == 'goldengear'){
         myGameProgression.remove_xion(price_goldengear_speedup);
-        golden_gear_spawn_delay -= 1000;
+        golden_gear_spawn_delay *= 0.975;
         goldengearTimesSpeedUp++;
         price_goldengear_speedup = cost_goldengear_speedup * Math.pow(coeff_goldengear_speedup, goldengearTimesSpeedUp);
     }else{
         myGameProgression.remove_xion(price_gear_speedup);
-        spawn_delay -= 100;
+        spawn_delay *= 0.95;
         gearTimesSpeedUp++;
         price_gear_speedup = cost_gear_speedup * Math.pow(coeff_gear_speedup, gearTimesSpeedUp);
     }
