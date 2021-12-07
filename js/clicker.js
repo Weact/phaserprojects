@@ -6,7 +6,7 @@ var config = {
     scene: {
         preload: preload,
         create: create,
-        update: update
+        update: update,
     },
     scale: {
         mode: Phaser.Scale.RESIZE,
@@ -276,6 +276,7 @@ function create(){
     display_buttons(true); // <= Show or hide every button group
     //display_button_group('gbtn_generator', false); // <= Chose a specific button group to hide or show
     display_button_group('gbtn_babybot', false);
+
 }
 
 function check_for_collectables_and_progression(){

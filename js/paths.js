@@ -29,10 +29,6 @@ var game_objects_path = {
     btn_speedup_goldengear: assets_clicker_path + "UI/SpeedUpGoldenGear.png",
     btn_cursor: assets_clicker_path + "UI/btn_cursor.png",
 
-    //MENU
-    btn_startgame: assets_clicker_path + "UI/PlayButton.png",
-    btn_exitgame: assets_clicker_path + "UI/ExitButton.png",
-
     //PLAYER
     mrstonks: { path : assets_clicker_path + "Player/MrStonksSheet.png" , dim: { frameWidth : 64 , frameHeight : 48 } }
 }
