@@ -884,7 +884,7 @@ function get_total_earnings(){
 
 function instanciate_platforms(){
     let w_offset = -200;
-    let h_offset = 250;
+    let h_offset = 200;
     platforms.create(1126 + w_offset, 700 + h_offset, 'platform');
     platforms.create(1198 + w_offset, 700 + h_offset, 'platform');
     platforms.create(1270 + w_offset, 700 + h_offset, 'platform');
