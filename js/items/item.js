@@ -126,7 +126,6 @@ class item{
         //this.set_price(this.price * this.price_coeff);
         if(this.name == "xion"){
             this.multiplier = this.multiplier * 2;
-            console.log(this.multiplier);
         }
         this.player_owned++;
         this.update_xion_per_second();
