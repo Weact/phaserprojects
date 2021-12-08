@@ -323,7 +323,7 @@ function activate_golden_xion(){
 }
 
 function respawn_and_deactivate_golden_xion(){
-    var rng_golden_xion_delay = Phaser.Math.Between(10000, 11111);
+    var rng_golden_xion_delay = Phaser.Math.Between(20000, 120000);
     console.log("GOLDEN XION WILL SPAWN AFTER : " + rng_golden_xion_delay)
     golden_xion_active = false;
     myScene.time.delayedCall(rng_golden_xion_delay, create_golden_xion);
@@ -332,6 +332,7 @@ function respawn_and_deactivate_golden_xion(){
 function destroy_golden_xion_if_inactive(target_goldenxion){
     if(target_goldenxion != undefined){
         target_goldenxion.destroy();
+        respawn_and_deactivate_golden_xion();
     }
 }
 
@@ -1049,7 +1050,7 @@ function _on_player_hit_iceblock(player, iceblock){
     player_hit_iceblock.play();
     myScene.cameras.main.shake(300, 0.01, true);
 
-    myGameProgression.remove_xion( myGameProgression.get_xion() * myGameProgression.get_xion_lost_rate() ); // removes 10% of current xion
+    myGameProgression.remove_xion( Math.min( myGameProgression.get_xion() * myGameProgression.get_xion_lost_rate() , xps * 5 ) ); // removes 10% of current xion or current xps * 5 (5seconds of progress)
 
     player.setTint(0xFF0000);
     myScene.time.delayedCall(500, recolor_player);
