@@ -191,6 +191,10 @@ var clickxion;
 var cam;
 var camshake;
 
+// golden xion
+var goldenxion;
+var golden_xion_active = false;
+
 // METHODS
 
 function preload(){
@@ -252,6 +256,7 @@ function create(){
 
     create_game_background();
     create_xion_clicker();
+    create_golden_xion();
     create_currencies();
     create_clicker_border();
 
@@ -299,6 +304,27 @@ function create(){
     display_button_group('gbtn_babybot', false);
 
     btn_trade_gear_goldengear.setVisible(false);
+}
+
+function create_golden_xion(){
+    goldenxion = myScene.add.image(myScene.cameras.main.width / 2, myScene.cameras.main.height / 2, 'xion').setScale(3).setDepth(20000).setInteractive();
+    goldenxion.setTint(0xFFCC00);
+    goldenxion.on('pointerdown', (myPointer, objectsClicked) => {
+        activate_golden_xion();
+    })
+    goldenxion.setPosition(Phaser.Math.FloatBetween(xion_x_min, xion_x_max), Phaser.Math.FloatBetween(xion_y_min, xion_y_max));
+}
+
+function activate_golden_xion(){
+    golden_xion_active = true;
+    goldenxion.destroy();
+    myScene.time.delayedCall(10000, deactivate_golden_xion);
+}
+
+function deactivate_golden_xion(){
+    var rng_golden_xion_delay = Phaser.Math.Between(30000, 120000);
+    golden_xion_active = false;
+    myScene.time.delayedCall(rng_golden_xion_delay, create_golden_xion);
 }
 
 function check_for_collectables_and_progression(){
@@ -490,6 +516,8 @@ function create_autoclicker_buttons() {
 
     items_upgrades_text.upgrade_clicker_text.cost = myScene.add.text(items_upgrades_text.upgrade_clicker_text.cost.x, items_upgrades_text.upgrade_clicker_text.cost.y, items_upgrades_text.upgrade_clicker_text.cost.e_text);
     items_upgrades_text.upgrade_clicker_text.owned = myScene.add.text(items_upgrades_text.upgrade_clicker_text.owned.x, items_upgrades_text.upgrade_clicker_text.owned.y, items_upgrades_text.upgrade_clicker_text.owned.e_text);
+
+    myScene.add.image(items_upgrade_text.upgrade_clicker_text.cost.x + 10, items_upgrades_text.upgrade_clicker_text.cost.y)
 }
 
 function create_autoclicker_buttons() {
@@ -630,7 +658,7 @@ function create_game_background() {
 function _on_xion_clicked(_pointer = undefined, _pointer_x = undefined, _pointer_y = undefined, _propagation = undefined, by_autoclicker = false){
     give_xion(xion_object);
     
-    if(by_autoclicker == false){
+    if(by_autoclicker == false && golden_xion_active == false){
         replace_xion();
     }
 
