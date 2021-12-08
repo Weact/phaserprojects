@@ -103,7 +103,7 @@ var goldenGearText;
 
 var gears;
 var golden_gears;
-var spawn_range = {x1: 920, x2: 1640, y1: 150, y2: 250};
+var spawn_range = {x1: 1020, x2: 1540, y1: 150, y2: 250};
 var spawn_delay = 5000; //gear spawn delay
 var golden_gear_spawn_delay = 60000; //golden gear spawn delay
 var gear_lifetime = 6000;
@@ -388,7 +388,6 @@ function update(time, delta){
     gameTime = gameTimeCurrent;
 
     player_movements();
-    update_pointer();
 }
 
 function create_speedup_button(){
@@ -626,10 +625,6 @@ function create_game_background() {
     let bg_scaleY = myScene.cameras.main.height / bg_image.height;
     let bg_scale = Math.max(bg_scaleX, bg_scaleY);
     bg_image.setScale(bg_scale).setScrollFactor(0);
-}
-
-function update_pointer(){ // TO BE REMOVED
-    mousePositionText.setText( ['x: ' + myPointer.worldX,'y: ' + myPointer.worldY ] );
 }
 
 function _on_xion_clicked(_pointer = undefined, _pointer_x = undefined, _pointer_y = undefined, _propagation = undefined, by_autoclicker = false){
@@ -1018,9 +1013,7 @@ function _on_player_hit_iceblock(player, iceblock){
     player_hit_iceblock.play();
     myScene.cameras.main.shake(300, 0.01, true);
 
-    myGameProgression.remove_gear( myGameProgression.get_gear() * myGameProgression.get_gear_lost_rate() ); // removes 15% of current gear
-    myGameProgression.remove_golden_gear( myGameProgression.get_golden_gear() * myGameProgression.get_golden_gear_lost_rate() ); // removes 5% of current golden gear
-    myGameProgression.remove_xion( myGameProgression.get_xion() * myGameProgression.get_xion_lost_rate() ); // removes 30% of current xion
+    myGameProgression.remove_xion( myGameProgression.get_xion() * myGameProgression.get_xion_lost_rate() ); // removes 10% of current xion
 
     player.setTint(0xFF0000);
     myScene.time.delayedCall(500, recolor_player);
