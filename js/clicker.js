@@ -256,7 +256,7 @@ function create(){
 
     create_game_background();
     create_xion_clicker();
-    create_golden_xion();
+    respawn_and_deactivate_golden_xion();
     create_currencies();
     create_clicker_border();
 
@@ -313,18 +313,26 @@ function create_golden_xion(){
         activate_golden_xion();
     })
     goldenxion.setPosition(Phaser.Math.FloatBetween(xion_x_min, xion_x_max), Phaser.Math.FloatBetween(xion_y_min, xion_y_max));
+    myScene.time.delayedCall(5000, destroy_golden_xion_if_inactive, [goldenxion]);
 }
 
 function activate_golden_xion(){
     golden_xion_active = true;
     goldenxion.destroy();
-    myScene.time.delayedCall(10000, deactivate_golden_xion);
+    myScene.time.delayedCall(10000, respawn_and_deactivate_golden_xion);
 }
 
-function deactivate_golden_xion(){
-    var rng_golden_xion_delay = Phaser.Math.Between(30000, 120000);
+function respawn_and_deactivate_golden_xion(){
+    var rng_golden_xion_delay = Phaser.Math.Between(10000, 11111);
+    console.log("GOLDEN XION WILL SPAWN AFTER : " + rng_golden_xion_delay)
     golden_xion_active = false;
     myScene.time.delayedCall(rng_golden_xion_delay, create_golden_xion);
+}
+
+function destroy_golden_xion_if_inactive(target_goldenxion){
+    if(target_goldenxion != undefined){
+        target_goldenxion.destroy();
+    }
 }
 
 function check_for_collectables_and_progression(){
