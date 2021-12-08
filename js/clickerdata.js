@@ -1,5 +1,5 @@
 class GameProgression{
-    constructor(xion = 0, gear = 0, golden_gear = 0, xion_lost_rate = 0.3, gear_lost_rate = 0.15, golden_gear_lost_rate = 0.05, items = []){
+    constructor(xion = 0, gear = 0, golden_gear = 0, xion_lost_rate = 0.10, gear_lost_rate = 1, golden_gear_lost_rate = 1, items = []){
         this.xion = xion;
         this.gear = gear;
         this.golden_gear = golden_gear;
